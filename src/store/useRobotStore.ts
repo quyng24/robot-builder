@@ -39,7 +39,7 @@ export const useRobotStore = create<RobotState>((set, get) => ({
       position: [0, 1, 0],
       rotation: [0, 0, 0],
       scale: [1, 1, 1],
-      parentId: get().selectedPartId || null, 
+      parentId: null, //get().selectedPartId || null, 
       properties: { ...catalogItem.defaultProperties },
     };
 
