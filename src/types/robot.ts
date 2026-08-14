@@ -1,4 +1,23 @@
-export type PartType = 'chassis' | 'wheel' | 'motor' | 'sensor';
+export type PartType =
+  | 'chassis'
+  | 'wheel'
+  | 'motor'
+  | 'sensor'
+  | 'battery'
+  | 'camera'
+  | 'controller'
+  | 'antenna'
+  | 'frame'
+  | 'pcb'
+  | 'cone'
+  | 'torus'
+  | 'capsule'
+  | 'ring'
+  | 'plane'
+  | 'dodecahedron'
+  | 'icosahedron'
+  | 'octahedron'
+  | 'tetrahedron';
 
 export type Vector3D = [number, number, number];
 

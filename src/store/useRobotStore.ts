@@ -7,8 +7,10 @@ interface RobotState {
   mode: 'build' | 'simulate';
   parts: RobotPart[];
   selectedPartId: string | null;
+  transformMode: 'translate' | 'rotate';
 
   setMode: (mode: 'build' | 'simulate') => void;
+  setTransformMode: (mode: 'translate' | 'rotate') => void;
   selectPart: (id: string | null) => void;
   
   addPart: (type: PartType) => void;
@@ -23,8 +25,11 @@ export const useRobotStore = create<RobotState>((set, get) => ({
   mode: 'build',
   parts: [],
   selectedPartId: null,
+  transformMode: 'translate',
 
   setMode: (mode) => set({ mode }),
+
+  setTransformMode: (mode: any) => set({transformMode: mode}),
   
   selectPart: (id) => set({ selectedPartId: id }),
 
