@@ -36,6 +36,15 @@ export const PART_CATALOG: Record<string, CatalogPart> = {
       fov: 30
     }
   },
+  wall: {
+    type: 'wall',
+    defaultName: 'Wall',
+    defaultPosition: [0, 1.5, 15],
+    defaultProperties: {
+      size: [10, 3, 1],
+      color: '#ef4444'
+    }
+  },
   battery: {
     type: 'battery',
     defaultName: 'Li-ion Battery',

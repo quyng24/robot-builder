@@ -26,6 +26,8 @@ export default function RobotTree() {
         return <Zap size={14} />;
       case "sensor":
         return <Radio size={14} />;
+      case "wall":
+        return <Box size={14} />;
       case "battery":
         return <BatteryCharging size={14} />;
       case "camera":

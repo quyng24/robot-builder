@@ -26,7 +26,7 @@ export default function Scene3D() {
             <RigidBody
               type="fixed"
               position={[0, -0.05, 0]}
-              collisionGroups={interactionGroups(0, [0, 1, 2])}
+              collisionGroups={interactionGroups(0, [1, 2])}
             >
               <mesh receiveShadow>
                 <boxGeometry args={[50, 0.1, 50]} />

@@ -3,6 +3,7 @@ export type PartType =
   | 'wheel'
   | 'motor'
   | 'sensor'
+  | 'wall'
   | 'battery'
   | 'camera'
   | 'controller'
@@ -25,6 +26,7 @@ export interface CatalogPart {
   type: PartType;
   defaultName: string;
   defaultProperties: Record<string, any>;
+  defaultPosition?: Vector3D;
 }
 
 export interface RobotPart {

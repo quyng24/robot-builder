@@ -20,6 +20,7 @@ const ICON_MAP: Record<string, { icon: LucideIcon; color: string }> = {
   wheel: { icon: Disc, color: "text-amber-400" },
   motor: { icon: Zap, color: "text-emerald-400" },
   sensor: { icon: Radio, color: "text-rose-400" },
+  wall: { icon: Box, color: "text-rose-500" },
   battery: { icon: BatteryCharging, color: "text-slate-400" },
   camera: { icon: Camera, color: "text-black" },
   controller: { icon: Cpu, color: "text-indigo-400" },

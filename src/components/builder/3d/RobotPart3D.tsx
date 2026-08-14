@@ -8,7 +8,6 @@ import { RobotPart } from "@/types/robot";
 
 export default function RobotPart3D({ part }: { part: RobotPart }) {
   const groupRef = useRef<THREE.Group>(null);
-  const meshRef = useRef<THREE.Mesh>(null);
   const { transformMode, selectedPartId, selectPart, updateTransform } =
     useRobotStore();
 
@@ -24,6 +23,8 @@ export default function RobotPart3D({ part }: { part: RobotPart }) {
         return <boxGeometry args={[0.6, 0.6, 0.8]} />;
       case "sensor":
         return <sphereGeometry args={[0.3, 16, 16]} />;
+      case "wall":
+        return <boxGeometry args={[10, 3, 1]} />;
       case "battery":
         return <boxGeometry args={[1, 0.5, 2]} />;
       case "camera":
@@ -69,6 +70,8 @@ export default function RobotPart3D({ part }: { part: RobotPart }) {
         return "#10b981"; // Green
       case "sensor":
         return "#f43f5e"; // Rose
+      case "wall":
+        return "#ef4444"; // Red
       case "battery":
         return "#374151"; // Gray
       case "camera":
@@ -149,9 +152,12 @@ export default function RobotPart3D({ part }: { part: RobotPart }) {
           object={groupRef as React.RefObject<THREE.Object3D>}
           mode={transformMode}
           onMouseUp={() => {
-            if (meshRef.current) {
+            // TransformControls moves the group, so persist the group's transform.
+            // Reading from an unattached mesh ref left the store at its original values,
+            // which made parts jump back when the simulation scene remounted.
+            if (groupRef.current) {
               if (transformMode === "translate") {
-                const { x, y, z } = meshRef.current.position;
+                const { x, y, z } = groupRef.current.position;
                 updateTransform(part.id, {
                   position: [
                     parseFloat(x.toFixed(2)),
@@ -160,7 +166,7 @@ export default function RobotPart3D({ part }: { part: RobotPart }) {
                   ],
                 });
               } else if (transformMode === "rotate") {
-                const { x, y, z } = meshRef.current.rotation;
+                const { x, y, z } = groupRef.current.rotation;
                 updateTransform(part.id, {
                   rotation: [
                     parseFloat(x.toFixed(2)),

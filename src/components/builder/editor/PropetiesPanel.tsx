@@ -6,7 +6,6 @@ export default function PropertiesPanel() {
   const { parts, selectedPartId, removePart, updateTransform, updateName } =
     useRobotStore();
   const selectedPartData = parts.find((p) => p.id === selectedPartId);
-  console.log(selectedPartData);
 
   return (
     <div className="h-72 flex flex-col bg-slate-900/60">

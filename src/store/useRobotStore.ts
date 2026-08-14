@@ -19,6 +19,7 @@ interface RobotState {
   updateTransform: (id: string, transform: { position?: Vector3D; rotation?: Vector3D; scale?: Vector3D }) => void;
   updateProperties: (id: string, properties: Record<string, any>) => void;
   setParent: (childId: string, parentId: string | null) => void;
+  loadProject: (parts: RobotPart[]) => void;
 }
 
 export const useRobotStore = create<RobotState>((set, get) => ({
@@ -41,7 +42,7 @@ export const useRobotStore = create<RobotState>((set, get) => ({
       id: uuidv4(),
       type: catalogItem.type,
       name: `${catalogItem.defaultName} ${get().parts.filter(p => p.type === type).length + 1}`,
-      position: [0, 1, 0],
+      position: catalogItem.defaultPosition || [0, 1, 0],
       rotation: [0, 0, 0],
       scale: [1, 1, 1],
       parentId: null, //get().selectedPartId || null, 
@@ -101,5 +102,13 @@ export const useRobotStore = create<RobotState>((set, get) => ({
         part.id === childId ? { ...part, parentId } : part
       )
     }));
-  }
+  },
+
+  loadProject: (parts) => {
+    set({
+      parts,
+      mode: 'build',
+      selectedPartId: null,
+    });
+  },
 }));
