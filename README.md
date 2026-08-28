@@ -1,36 +1,184 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤖 Robot Builder & 3D Simulator
 
-## Getting Started
+> **Project Status:** Prototype / MVP in active development  
+> **Purpose:** Browser-based robot construction, 3D visualization, and physics simulation.
 
-First, run the development server:
+**Robot Builder** is a web application that allows users to build modular robots and test them in a 3D physics environment.
+
+Our core philosophy and long-term workflow is:  
+`DESIGN → PROGRAM → SIMULATE → TEST`
+
+---
+
+## ✨ Current Features (MVP)
+
+The project is currently in the MVP stage with the following functional features:
+
+- **3D Robot Assembly:** Build robots using a library of predefined components (chassis, wheels, sensors, walls, generic geometries).
+- **Transform Controls:** Translate and rotate components in a 3D viewport.
+- **Project Management:** Save and open robot assemblies as `.json` files.
+- **Physics Simulation:** Basic Rapier-powered simulation including:
+  - Wheel motors and revolute joints.
+  - Basic gravity, ground, and wall collisions.
+  - Distance sensor raycasting (basic obstacle detection to stop motors).
+- **Zustand State Management:** Centralized state handling for the editor and simulation.
+
+> ⚠️ **Note:** Features like actual code execution, Blockly visual programming, complex parent-child local transforms, and realistic motor torques are _planned_ but not yet implemented.
+
+---
+
+## 🛠 Tech Stack
+
+**Frontend:**
+
+- Next.js 16.3.0 / React 19.2.8 (Server-Side Rendering disabled for 3D components)
+- TypeScript 5
+- Tailwind CSS 4 & Lucide React
+
+**3D & Physics:**
+
+- Three.js 0.182.x
+- React Three Fiber 9.7.x / React Three Drei 10.7.x
+- React Three Rapier (Physics engine) 2.2.x
+
+**State Management:**
+
+- Zustand 5.0.x
+- UUID 14.x
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server (runs on http://localhost:3000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# 🏗 Architecture & Data Model
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## The Golden Rule
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The robot is represented by a stable domain model (**RobotPart**).  
+The editor, 3D renderer, and physics engine simply consume this model via Zustand rather than independently maintaining their own versions.
 
-## Learn More
+## Core Data Model (RobotPart)
 
-To learn more about Next.js, take a look at the following resources:
+The source of truth for every component in the project.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+interface RobotPart {
+  id: string;
+  type: PartType; // 'chassis', 'wheel', 'sensor', etc.
+  name: string;
+  position: [number, number, number]; // [x, y, z]
+  rotation: [number, number, number]; // [x, y, z] in radians
+  scale: [number, number, number];
+  parentId: string | null;
+  properties: Record<string, any>;
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# ⚙️ State Management (`useRobotStore.ts`)
 
-## Deploy on Vercel
+Zustand handles all global states:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `mode`
+- `parts`
+- `selectedPartId`
+- `transformMode`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+👉 Never duplicate robot state in UI components.
+
+---
+
+# 🗺 Development Roadmap
+
+The project will evolve incrementally through these phases:
+
+## 1. Stabilize Editor
+
+- Implement keyboard shortcuts
+- Undo/redo functionality
+- Real parent-child transform hierarchy
+- Typed property panels
+
+## 2. Improve Physics
+
+- Add realistic friction
+- Differential drive
+- Center of mass
+- Physical attachments
+
+## 3. Sensor System
+
+- Expand from simple raycasts
+- Field of View (FOV)
+- Line sensors
+- Camera abstractions
+
+## 4. Programming & Visual Blocks
+
+- Sandboxed execution environment
+- Robot API
+- Blockly integration
+
+## 5. Advanced Simulator & Platform
+
+- Custom environments
+- Cloud saves
+- User accounts
+- AI integration
+
+---
+
+# 🤖 Instructions for AI Agents & Contributors
+
+If you are an AI assistant continuing development on this project, strictly follow these rules:
+
+## Read Existing Architecture First
+
+Always inspect:
+
+- `src/types/robot.ts`
+- `src/lib/catalog.ts`
+- `useRobotStore.ts`
+- Core 3D files
+
+## Incremental Changes
+
+- Do not rewrite the entire 3D architecture.
+- Identify the smallest change needed.
+- Preserve existing behaviors.
+
+## Keep Separation of Concerns
+
+- **UI → Zustand → Domain Model → Simulation System**
+- Do not put complex physics logic inside UI sidebars.
+
+## Preserve JSON Compatibility
+
+- Current schema version: **1**
+- If modifying schema, implement migration logic.
+- Do not break old `.json` saves.
+
+## Beware of Three.js & Physics Remounts
+
+- Modifying how components mount can reset Rapier physics bodies.
+- Be careful with transforms, collision groups, and joint references.
+  - `0 = ground`
+  - `1 = chassis`
+  - `2 = wheels`
+  - `3 = walls`
+  - `4 = sensors`
+
+## Radians, not Degrees
+
+- Rotations are stored as **Euler radians**.
+- Convert to degrees only at the UI boundary.

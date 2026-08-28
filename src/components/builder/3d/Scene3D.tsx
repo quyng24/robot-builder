@@ -3,13 +3,13 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid, Environment } from "@react-three/drei";
 import { useRobotStore } from "@/store/useRobotStore";
-import RobotPart3D from "./RobotPart3D";
 import { Suspense } from "react";
 import { interactionGroups, Physics, RigidBody } from "@react-three/rapier";
-import SimulatedRobot from "./SimulateRobot";
+import RobotAssembly from "./RobotAssembly";
+import EditorGizmo from "./EditorGizmo";
 
 export default function Scene3D() {
-  const { mode, parts, selectPart } = useRobotStore();
+  const { parts, selectPart } = useRobotStore();
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -22,7 +22,7 @@ export default function Scene3D() {
           <directionalLight position={[10, 10, 10]} intensity={1} castShadow />
           <Environment preset="city" />
 
-          <Physics paused={mode === "build"} debug>
+          <Physics debug>
             <RigidBody
               type="fixed"
               position={[0, -0.05, 0]}
@@ -38,12 +38,10 @@ export default function Scene3D() {
               </mesh>
             </RigidBody>
 
-            {mode === "build" ? (
-              parts.map((part) => <RobotPart3D key={part.id} part={part} />)
-            ) : (
-              <SimulatedRobot parts={parts} />
-            )}
+            <RobotAssembly parts={parts} />
           </Physics>
+
+          <EditorGizmo />
 
           <Grid
             infiniteGrid

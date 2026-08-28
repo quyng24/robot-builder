@@ -1,30 +1,16 @@
 export type PartType =
   | 'chassis'
   | 'wheel'
-  | 'motor'
   | 'sensor'
   | 'wall'
-  | 'battery'
-  | 'camera'
-  | 'controller'
-  | 'antenna'
-  | 'frame'
-  | 'pcb'
-  | 'cone'
-  | 'torus'
-  | 'capsule'
-  | 'ring'
-  | 'plane'
-  | 'dodecahedron'
-  | 'icosahedron'
-  | 'octahedron'
-  | 'tetrahedron';
+  | 'box';
 
 export type Vector3D = [number, number, number];
 
 export interface CatalogPart {
   type: PartType;
   defaultName: string;
+  category: 'robot' | 'environment' | 'basic';
   defaultProperties: Record<string, any>;
   defaultPosition?: Vector3D;
 }

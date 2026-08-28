@@ -8,7 +8,9 @@ interface RobotState {
   parts: RobotPart[];
   selectedPartId: string | null;
   transformMode: 'translate' | 'rotate';
+  isBlocked: boolean;
 
+  setIsBlocked: (blocked: boolean) => void;
   setMode: (mode: 'build' | 'simulate') => void;
   setTransformMode: (mode: 'translate' | 'rotate') => void;
   selectPart: (id: string | null) => void;
@@ -27,7 +29,9 @@ export const useRobotStore = create<RobotState>((set, get) => ({
   parts: [],
   selectedPartId: null,
   transformMode: 'translate',
+  isBlocked: false,
 
+  setIsBlocked: (blocked) => set({ isBlocked: blocked}),
   setMode: (mode) => set({ mode }),
 
   setTransformMode: (mode: any) => set({transformMode: mode}),
