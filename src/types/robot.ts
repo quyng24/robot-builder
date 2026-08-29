@@ -13,6 +13,7 @@ export interface CatalogPart {
   category: 'robot' | 'environment' | 'basic';
   defaultProperties: Record<string, any>;
   defaultPosition?: Vector3D;
+  defaultScale?: Vector3D;
 }
 
 export interface RobotPart {

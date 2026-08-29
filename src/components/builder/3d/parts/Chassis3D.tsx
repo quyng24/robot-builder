@@ -1,10 +1,11 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useRef } from "react";
 import {
   RigidBody,
   RapierRigidBody,
   CuboidCollider,
   interactionGroups,
 } from "@react-three/rapier";
+import { usePublishRigidBody } from "@/simulation/bridge/usePublishRigidBody";
 import { RobotPart } from "@/types/robot";
 import { useRobotStore } from "@/store/useRobotStore";
 
@@ -18,10 +19,16 @@ const Chassis3D = forwardRef<RapierRigidBody, Props>(
     const mode = useRobotStore((state) => state.mode);
     const selectPart = useRobotStore((state) => state.selectPart);
     const bodyType = mode === "build" ? "kinematicPosition" : "dynamic";
+    const bodyRef = useRef<RapierRigidBody>(null!);
+    usePublishRigidBody(part.id, part.type, bodyRef);
 
     return (
       <RigidBody
-        ref={ref}
+        ref={(node) => {
+          bodyRef.current = node!;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node!;
+        }}
         type={bodyType}
         position={part.position}
         rotation={part.rotation as any}

@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid, Environment } from "@react-three/drei";
 import { useRobotStore } from "@/store/useRobotStore";
+import SimulationStepper from "@/simulation/bridge/SimulationStepper";
 import { Suspense } from "react";
 import { interactionGroups, Physics, RigidBody } from "@react-three/rapier";
 import RobotAssembly from "./RobotAssembly";
@@ -22,7 +23,8 @@ export default function Scene3D() {
           <directionalLight position={[10, 10, 10]} intensity={1} castShadow />
           <Environment preset="city" />
 
-          <Physics debug>
+          <Physics paused>
+            <SimulationStepper />
             <RigidBody
               type="fixed"
               position={[0, -0.05, 0]}

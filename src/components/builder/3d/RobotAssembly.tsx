@@ -8,11 +8,13 @@ import Chassis3D from "./parts/Chassis3D";
 import Sensor3D from "./parts/Sensor3D";
 import SimulatedWheel3D from "./SimulatedWheel3D";
 import Wheel3D from "./parts/Wheel3D";
+import { useSimulationGeneration } from "@/simulation";
 import { useRobotStore } from "@/store/useRobotStore";
 
 export default function RobotAssembly({ parts }: { parts: RobotPart[] }) {
   const chassisRef = useRef<RapierRigidBody>(null!);
   const mode = useRobotStore((state) => state.mode);
+  const generation = useSimulationGeneration();
 
   const chassis = parts.find((p) => p.type === "chassis");
   const wheels = parts.filter((p) => p.type === "wheel");
@@ -23,37 +25,36 @@ export default function RobotAssembly({ parts }: { parts: RobotPart[] }) {
   );
   return (
     <>
-      {walls.map((wall) => {
-        <Box3D key={`${wall.id}-${mode}`} part={wall} />;
-      })}
+      {walls.map((wall) => (
+        <Box3D key={`${wall.id}-${mode}-${generation}`} part={wall} />
+      ))}
+
+      {staticParts.map((part) => (
+        <Box3D key={`${part.id}-${mode}-${generation}`} part={part} />
+      ))}
 
       {chassis && (
         <Chassis3D
-          key={`${chassis.id}-${mode}`}
+          key={`${chassis.id}-${mode}-${generation}`}
           part={chassis}
           ref={chassisRef}
         >
-          {sensor && <Sensor3D part={sensor} chassis={chassis} />}
-
-          {staticParts.map((part) => (
-            <mesh
-              key={part.id}
-              position={part.position}
-              rotation={part.rotation as any}
-            >
-              <boxGeometry args={[0.5, 0.5, 0.5]} />
-              <meshStandardMaterial color="#94a3b8" />
-            </mesh>
-          ))}
+          {sensor && (
+            <Sensor3D
+              part={sensor}
+              chassis={chassis}
+              chassisRef={chassisRef}
+            />
+          )}
         </Chassis3D>
       )}
 
       {wheels.map((wheel) => {
         if (mode === "build" || !chassis)
-          return <Wheel3D key={wheel.id} part={wheel} />;
+          return <Wheel3D key={`${wheel.id}-${generation}`} part={wheel} />;
         return (
           <SimulatedWheel3D
-            key={wheel.id}
+            key={`${wheel.id}-${generation}`}
             part={wheel}
             chassis={chassis}
             chassisRef={chassisRef}

@@ -13,7 +13,13 @@ export const PART_CATALOG: Record<string, CatalogPart> = {
     defaultName: 'Wheel',
     category: 'robot',
     defaultPosition: [0.5, 0.5, 0.2],
-    defaultProperties: { color: '#333333', motorTorque: 5, maxSpeed: 10 },
+    defaultProperties: {
+      color: '#333333',
+      radius: 0.5,
+      width: 0.4,
+      motorTorque: 5,
+      maxSpeed: 10,
+    },
   },
   sensor: {
     type: 'sensor',
@@ -26,7 +32,8 @@ export const PART_CATALOG: Record<string, CatalogPart> = {
      type: 'wall',
     defaultName: 'Brick Wall',
     category: 'environment',
-    defaultPosition: [5, 2, 0.5],
+    defaultPosition: [5, 1.5, 0.5],
+    defaultScale: [6, 3, 0.5],
     defaultProperties: { color: '#8b4513', isStatic: true },
   },
   box: {

@@ -2,23 +2,38 @@
 
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
-import { useRapier, interactionGroups } from "@react-three/rapier";
+import {
+  interactionGroups,
+  RapierRigidBody,
+  useAfterPhysicsStep,
+  useRapier,
+} from "@react-three/rapier";
+import { getSimulationState } from "@/simulation";
 import { RobotPart } from "@/types/robot";
 import { useRobotStore } from "@/store/useRobotStore";
 
 interface SensorProps {
   part: RobotPart;
   chassis: RobotPart;
+  chassisRef: React.RefObject<RapierRigidBody>;
 }
 
-export default function Sensor3D({ part, chassis }: SensorProps) {
+export default function Sensor3D({
+  part,
+  chassis,
+  chassisRef,
+}: SensorProps) {
   const mode = useRobotStore((state) => state.mode);
   const setIsBlocked = useRobotStore((state) => state.setIsBlocked);
+  const selectPart = useRobotStore(state => state.selectPart);
 
   const sensorRef = useRef<THREE.Mesh>(null!);
   const sensorMatRef = useRef<THREE.MeshStandardMaterial>(null!);
   const laserMatRef = useRef<THREE.MeshBasicMaterial>(null!);
+  const chassisQuaternion = useRef(new THREE.Quaternion());
+  const localQuaternion = useRef(new THREE.Quaternion());
+  const sensorWorldPosition = useRef(new THREE.Vector3());
+  const sensorWorldQuaternion = useRef(new THREE.Quaternion());
 
   const { rapier, world } = useRapier();
   const sensorRange = Number(part.properties.range) || 5;
@@ -44,45 +59,80 @@ export default function Sensor3D({ part, chassis }: SensorProps) {
     return { localPos: pos, localEuler: euler };
   }, [part, chassis]);
 
-  useFrame(() => {
+  useAfterPhysicsStep(() => {
     if (mode === "build") {
       setIsBlocked(false);
       return;
     }
 
-    if (sensorRef.current && sensorMatRef.current && laserMatRef.current) {
-      const pos = new THREE.Vector3();
-      sensorRef.current.getWorldPosition(pos);
+    const chassisBody = chassisRef.current;
+    if (!chassisBody || !sensorMatRef.current || !laserMatRef.current) return;
 
-      const sensorQuaternion = new THREE.Quaternion();
-      sensorRef.current.getWorldQuaternion(sensorQuaternion);
+    const chassisPosition = chassisBody.translation();
+    const chassisRotation = chassisBody.rotation();
+    chassisQuaternion.current.set(
+      chassisRotation.x,
+      chassisRotation.y,
+      chassisRotation.z,
+      chassisRotation.w,
+    );
+    localQuaternion.current.setFromEuler(localEuler);
+    sensorWorldQuaternion.current
+      .copy(chassisQuaternion.current)
+      .multiply(localQuaternion.current);
+    sensorWorldPosition.current
+      .copy(localPos)
+      .applyQuaternion(chassisQuaternion.current)
+      .add({
+        x: chassisPosition.x,
+        y: chassisPosition.y,
+        z: chassisPosition.z,
+      });
 
-      const forward = new THREE.Vector3(0, 0, 1)
-        .applyQuaternion(sensorQuaternion)
-        .normalize();
+    const forward = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(sensorWorldQuaternion.current)
+      .normalize();
 
-      const ray = new rapier.Ray(
-        { x: pos.x, y: pos.y, z: pos.z },
-        { x: forward.x, y: forward.y, z: forward.z },
-      );
+    const ray = new rapier.Ray(
+      {
+        x: sensorWorldPosition.current.x,
+        y: sensorWorldPosition.current.y,
+        z: sensorWorldPosition.current.z,
+      },
+      { x: forward.x, y: forward.y, z: forward.z },
+    );
 
-      const hit = world.castRay(
-        ray,
-        sensorRange,
-        true,
-        undefined,
-        interactionGroups(4, [3]),
-      );
+    const hit = world.castRay(
+      ray,
+      sensorRange,
+      true,
+      undefined,
+      interactionGroups(4, [3]),
+    );
 
-      if (hit) {
-        setIsBlocked(true);
-        sensorMatRef.current.color.set("#ef4444");
-        laserMatRef.current.color.set("#ef4444");
-      } else {
-        setIsBlocked(false);
-        sensorMatRef.current.color.set("#10b981");
-        laserMatRef.current.color.set("#10b981");
-      }
+    if (hit) {
+      const distance = hit.timeOfImpact;
+      setIsBlocked(true);
+      getSimulationState().setRobotBlocked(true);
+      getSimulationState().upsertSensor({
+        id: part.id,
+        range: sensorRange,
+        distance,
+        blocked: true,
+      });
+      sensorMatRef.current.color.set("#ef4444");
+      laserMatRef.current.color.set("#ef4444");
+    } else {
+      setIsBlocked(false);
+      getSimulationState().setRobotBlocked(false);
+      getSimulationState().upsertSensor({
+        id: part.id,
+        range: sensorRange,
+        distance: null,
+        blocked: false,
+      });
+      sensorMatRef.current.color.set("#10b981");
+      laserMatRef.current.color.set("#10b981");
     }
   });
 
@@ -95,7 +145,14 @@ export default function Sensor3D({ part, chassis }: SensorProps) {
       <sphereGeometry args={[0.3, 16, 16]} />
       <meshStandardMaterial ref={sensorMatRef} color="#94a3b8" />
 
-      <mesh position={[0, 0, sensorRange / 2]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh
+        position={[0, 0, sensorRange / 2]}
+        rotation={[Math.PI / 2, 0, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (mode === 'build') selectPart(part.id)
+        }}
+      >
         <cylinderGeometry args={[0.02, 0.02, sensorRange]} />
         <meshBasicMaterial
           ref={laserMatRef}

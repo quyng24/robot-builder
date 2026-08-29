@@ -1,54 +1,77 @@
-"use client"; // Chỉ component này cần Client-side JS
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Header() {
+const NAV_LINKS = [
+  { href: "/#how-it-works", label: "Quy trình" },
+  { href: "/#no-hardware", label: "Chi phí 0đ" },
+  { href: "/#library", label: "Linh kiện" },
+  { href: "/#simulator", label: "Mô phỏng 3D" },
+  { href: "/#built-for-learning", label: "Phương pháp" },
+];
+
+type HeaderProps = {
+  ctaHref?: string;
+  ctaLabel?: string;
+};
+
+export default function Header({
+  ctaHref = "/builder",
+  ctaLabel = "Bắt đầu chế tạo",
+}: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <>
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-4 md:px-6 py-4 max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-2 font-bold text-lg md:text-xl text-cyan-400">
-          <span className="text-xl md:text-2xl">🤖</span> RoboSim3D
-        </div>
+    <header className="sticky top-0 z-50 bg-white shadow-[0_8px_24px_-12px_rgba(15,23,42,0.18)]">
+      <div className="h-1 bg-linear-to-r from-cyan-500 via-cyan-600 to-sky-600" />
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm text-slate-300">
-          <a href="#how-it-works" className="hover:text-cyan-400 transition">
-            Procedure
-          </a>
-          <a href="#no-hardware" className="hover:text-cyan-400 transition">
-            Expense
-          </a>
-          <a href="#library" className="hover:text-cyan-400 transition">
-            Accessory
-          </a>
-          <a href="#simulator" className="hover:text-cyan-400 transition">
-            3D Simulator
-          </a>
-          <a
-            href="#built-for-learning"
-            className="hover:text-cyan-400 transition"
-          >
-            Study
-          </a>
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-[4.25rem] flex items-center justify-between gap-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 min-w-0 group"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <span className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-cyan-600 text-lg shadow-sm shadow-cyan-600/30 group-hover:bg-cyan-500 transition">
+            🤖
+          </span>
+          <span className="flex flex-col leading-tight">
+            <span className="font-extrabold text-base md:text-lg tracking-tight text-slate-900">
+              RoboSim<span className="text-cyan-600">3D</span>
+            </span>
+            <span className="hidden sm:block text-[10px] font-medium text-slate-500 tracking-wide">
+              Build · Simulate · Learn
+            </span>
+          </span>
+        </Link>
+
+        <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-slate-600">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="px-3 py-2 rounded-lg hover:text-cyan-700 hover:bg-cyan-50 transition"
+            >
+              {link.label}
+            </a>
+          ))}
           <Link
-            href="/builder"
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-4 py-2 rounded-lg transition"
+            href={ctaHref}
+            className="ml-3 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4 py-2 rounded-lg transition shadow-sm shadow-cyan-600/25"
           >
-            Create first robot
+            {ctaLabel}
           </Link>
         </nav>
 
-        {/* Mobile Menu Button */}
         <button
-          className="lg:hidden text-slate-300 hover:text-cyan-400 focus:outline-none"
+          type="button"
+          className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 transition"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle Menu"
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMobileMenuOpen}
         >
           <svg
-            className="w-6 h-6"
+            className="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -70,55 +93,31 @@ export default function Header() {
             )}
           </svg>
         </button>
-      </header>
+      </div>
 
-      {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed top-17 left-0 w-full bg-slate-950/95 border-b border-slate-800 z-40 px-4 py-6 flex flex-col gap-4 backdrop-blur">
-          <a
-            href="#how-it-works"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-slate-300 hover:text-cyan-400 text-lg font-medium"
-          >
-            Procedure
-          </a>
-          <a
-            href="#no-hardware"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-slate-300 hover:text-cyan-400 text-lg font-medium"
-          >
-            Expense
-          </a>
-          <a
-            href="#library"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-slate-300 hover:text-cyan-400 text-lg font-medium"
-          >
-            Accessory
-          </a>
-          <a
-            href="#simulator"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-slate-300 hover:text-cyan-400 text-lg font-medium"
-          >
-            3D Simulator
-          </a>
-          <a
-            href="#built-for-learning"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-slate-300 hover:text-cyan-400 text-lg font-medium"
-          >
-            Study
-          </a>
-          <Link
-            href="/builder"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="mt-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-4 py-3 rounded-lg text-center transition"
-          >
-            Create first robot
-          </Link>
+        <div className="lg:hidden border-t border-slate-200 bg-slate-50">
+          <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-3 py-3 rounded-lg text-slate-800 font-medium hover:bg-white hover:text-cyan-700 transition"
+              >
+                {link.label}
+              </a>
+            ))}
+            <Link
+              href={ctaHref}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="mt-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-3 rounded-xl text-center transition"
+            >
+              {ctaLabel}
+            </Link>
+          </nav>
         </div>
       )}
-    </>
+    </header>
   );
 }

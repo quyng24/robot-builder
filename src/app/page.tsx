@@ -1,364 +1,510 @@
 import Link from "next/link";
 import CodeIdePreview from "@/components/honepage/CodeIdePreview";
 import Header from "@/components/honepage/Header";
+import {
+  Box,
+  Disc,
+  Radio,
+  RotateCw,
+  Camera,
+  BatteryCharging,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  Activity,
+  ShieldCheck,
+} from "lucide-react";
 
 export default function HomePage() {
   const robotParts = [
-    { name: "Body", icon: "▣", desc: "Chassis and Protective Housing" },
-    { name: "Motor", icon: "⚙", desc: "DC rotary motor" },
-    { name: "Wheel", icon: "○", desc: "Caster wheel" },
-    { name: "Sensor", icon: "◉", desc: "Proximity/Line-following sensor" },
-    { name: "Servo", icon: "↻", desc: "Rotation angle control motor" },
-    { name: "Camera", icon: "📷", desc: "Image Sensors & AI" },
-    { name: "Battery", icon: "🔋", desc: "Power Supply & Energy Management" },
+    {
+      name: "Chassis & Frame",
+      category: "Khung gầm",
+      icon: Box,
+      desc: "Khung trung tâm chịu lực, định hình kết cấu và toạ độ gốc của toàn bộ robot.",
+      specs: "Khối lượng: 10 - 25kg · Collision Box",
+    },
+    {
+      name: "Wheel & Motor",
+      category: "Truyền động",
+      icon: Disc,
+      desc: "Động cơ DC kết hợp bánh xe mô phỏng khớp quay Revolute Joint và mô-men xoắn.",
+      specs: "Torque: 5Nm · Tốc độ: 15 rad/s",
+    },
+    {
+      name: "Distance Sensor (LIDAR)",
+      category: "Cảm biến",
+      icon: Radio,
+      desc: "Phát tia Raycast 60Hz thời gian thực đo khoảng cách và nhận diện vật cản đa hướng.",
+      specs: "Tầm quét: 0.1 - 10m · Laser Beam",
+    },
+    {
+      name: "Servo Actuator",
+      category: "Khớp xoay",
+      icon: RotateCw,
+      desc: "Khớp điều khiển góc chính xác cho cánh tay robot và các cơ cấu nâng hạ.",
+      specs: "Góc quay: 0° - 180° · PID Control",
+    },
+    {
+      name: "Vision & Camera",
+      category: "Thị giác máy",
+      icon: Camera,
+      desc: "Thu nhận hình ảnh không gian 3D phục vụ xử lý AI và thuật toán bám làn đường.",
+      specs: "FOV: 90° · Stream RGB",
+    },
+    {
+      name: "Battery & Power Unit",
+      category: "Năng lượng",
+      icon: BatteryCharging,
+      desc: "Hệ thống quản lý nguồn và phân bổ điện áp cho vi điều khiển cùng các motor.",
+      specs: "Output: 12V · Năng lượng mô phỏng",
+    },
+  ];
+
+  const comparisonRows = [
+    {
+      item: "Board vi điều khiển (Arduino / ESP32)",
+      traditional: "180.000₫",
+      robosim: "0₫ Miễn phí",
+    },
+    {
+      item: "Động cơ DC giảm tốc + 2 Bánh xe",
+      traditional: "90.000₫",
+      robosim: "0₫ Miễn phí",
+    },
+    {
+      item: "Cảm biến khoảng cách LIDAR / Siêu âm",
+      traditional: "80.000₫",
+      robosim: "0₫ Miễn phí",
+    },
+    {
+      item: "Khung xe mica, dây nối, khay pin",
+      traditional: "150.000₫",
+      robosim: "0₫ Miễn phí",
+    },
+    {
+      item: "Rủi ro chập cháy vi mạch khi thử nghiệm",
+      traditional: "Tốn thêm chi phí",
+      robosim: "An toàn tuyệt đối (Reset 1s)",
+    },
   ];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Navigation */}
+    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-cyan-100 selection:text-cyan-900">
       <Header />
 
-      {/* 1. Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
-        <div className="text-center lg:text-left">
-          <div className="inline-block px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 text-xs font-semibold mb-4 border border-cyan-800">
-            Robotics Learning & Simulation Platform
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-4 md:mb-6">
-            Build. Simulate. <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500">
-              Make Robots.
-            </span>
-          </h1>
-          <p className="text-slate-400 text-base md:text-lg mb-6 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-            Design 3D robots, program behavior and test in a simulation
-            environment right in the browser.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-            <Link
-              href="/builder"
-              className="w-full sm:w-auto bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl transition shadow-lg shadow-cyan-500/20 text-center"
-            >
-              Create first robot
-            </Link>
-            <a
-              href="#simulator"
-              className="w-full sm:w-auto border border-slate-700 hover:border-slate-500 text-slate-300 font-medium px-6 py-3.5 rounded-xl transition text-center"
-            >
-              Explore Simulator
-            </a>
-          </div>
-          <p className="mt-6 text-sm text-slate-500 flex items-center justify-center lg:justify-start gap-2">
-            <span className="text-emerald-400">✓</span>
-            No need to buy hardware to get started
-          </p>
-        </div>
+      {/* HERO SECTION */}
+      <section className="relative pt-10 pb-16 md:pt-16 md:pb-24 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-linear-to-r from-cyan-300/25 via-sky-300/20 to-indigo-300/20 blur-3xl -z-10 rounded-full"
+        />
 
-        {/* Hero Code IDE / Simulation Tab Component */}
-        <div className="relative rounded-2xl border border-slate-800 bg-slate-900/50 p-2 shadow-2xl mt-6 lg:mt-0">
-          <CodeIdePreview />
-        </div>
-      </section>
-
-      {/* No Hardware Required Section */}
-      <section
-        id="no-hardware"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-slate-900"
-      >
-        <div className="text-center mb-10 md:mb-14">
-          <div className="inline-block px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 text-xs font-semibold mb-4 border border-cyan-800">
-            No Hardware Required
-          </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            Start building without buying hardware.
-          </h2>
-          <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            No need to order parts in advance. Every component is accurately
-            simulated in the browser — learn, trial and error as much as
-            possible, completely free.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {/* Traditional path */}
-          <div className="p-6 md:p-8 rounded-2xl bg-slate-900/50 border border-slate-800">
-            <h3 className="text-xs md:text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4 md:mb-6">
-              Traditional methods
-            </h3>
-            <ul className="space-y-3 text-sm mb-6">
-              <li className="flex justify-between text-slate-500 gap-4">
-                <span className="line-through decoration-slate-600">
-                  Arduino / Microcontroller
-                </span>
-                <span className="line-through decoration-slate-600 shrink-0">
-                  180k ₫
-                </span>
-              </li>
-              <li className="flex justify-between text-slate-500 gap-4">
-                <span className="line-through decoration-slate-600">
-                  DC motor + wheel
-                </span>
-                <span className="line-through decoration-slate-600 shrink-0">
-                  90k ₫
-                </span>
-              </li>
-              <li className="flex justify-between text-slate-500 gap-4">
-                <span className="line-through decoration-slate-600">
-                  Sensors & Servos
-                </span>
-                <span className="line-through decoration-slate-600 shrink-0">
-                  80k ₫
-                </span>
-              </li>
-              <li className="flex justify-between text-slate-500 gap-4">
-                <span className="line-through decoration-slate-600">
-                  Frame, cable, battery
-                </span>
-                <span className="line-through decoration-slate-600 shrink-0">
-                  150k ₫
-                </span>
-              </li>
-            </ul>
-            <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-baseline gap-2">
-              <span className="text-slate-400 text-xs md:text-sm font-medium">
-                Cost before writing code
-              </span>
-              <span className="text-lg md:text-xl font-bold text-slate-500 line-through decoration-red-500/70">
-                ~500.000₫
-              </span>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100/70 text-cyan-800 text-xs font-semibold mb-6">
+              <Sparkles size={14} className="text-cyan-600" />
+              <span>Nền Tảng Giả Lập & Lập Trình Robot 3D</span>
             </div>
-          </div>
 
-          {/* RoboSim3D path */}
-          <div className="p-6 md:p-8 rounded-2xl bg-slate-900 border border-cyan-500/40 relative shadow-lg shadow-cyan-500/10">
-            <span className="absolute -top-3 right-6 bg-cyan-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-full">
-              Free
-            </span>
-            <h3 className="text-xs md:text-sm font-semibold text-cyan-400 uppercase tracking-widest mb-4 md:mb-6">
-              With RoboSim3D
-            </h3>
-            <ul className="space-y-3 text-sm mb-6">
-              {[
-                "Body & Chassis",
-                "Motor & Wheel",
-                "Servo",
-                "Sensors",
-                "Battery & Power",
-              ].map((item, i) => (
-                <li key={i} className="flex justify-between text-slate-200">
-                  <span className="flex items-center gap-2">
-                    <span className="text-emerald-400">✓</span> {item}
-                  </span>
-                  <span className="text-slate-400">0₫</span>
-                </li>
-              ))}
-            </ul>
-            <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-baseline gap-2">
-              <span className="text-slate-300 text-xs md:text-sm font-medium">
-                Cost to get started today
-              </span>
-              <span className="text-xl md:text-2xl font-extrabold text-cyan-400">
-                0₫
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.12] mb-6 text-slate-950">
+              Thiết kế. Lập trình. <br />
+              <span className="text-cyan-700">Mô phỏng Robot 3D.</span>
+            </h1>
 
-      {/* 2. How It Works Section */}
-      <section
-        id="how-it-works"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-slate-900"
-      >
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">How It Works</h2>
-          <p className="text-cyan-400 font-mono text-xs md:text-sm tracking-widest uppercase">
-            DESIGN → PROGRAM → SIMULATE
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {[
-            {
-              step: "01",
-              title: "1. Design",
-              subtitle: "Assemble your robot",
-              desc: "Choose the chassis, mount the engine, sensors and fine-tune 3D spatial coordinates.",
-            },
-            {
-              step: "02",
-              title: "2. Program",
-              subtitle: "Define its behavior",
-              desc: "Write control code or use block drag and drop to define operating logic.",
-            },
-            {
-              step: "03",
-              title: "3. Simulate",
-              subtitle: "Test in 3D",
-              desc: "Run tests in accurately simulated physical environments before going live.",
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="p-6 md:p-8 rounded-2xl bg-slate-900/80 border border-slate-800 relative"
-            >
-              <span className="text-3xl md:text-4xl font-bold text-cyan-500/20 absolute top-4 right-6">
-                {item.step}
-              </span>
-              <h3 className="text-lg md:text-xl font-bold text-cyan-400 mb-2">
-                {item.title}
-              </h3>
-              <p className="text-slate-300 font-medium mb-2 text-sm md:text-base">
-                {item.subtitle}
-              </p>
-              <p className="text-slate-400 text-xs md:text-sm">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Robot Parts Library */}
-      <section
-        id="library"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-slate-900"
-      >
-        <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">
-            Robot Parts Library
-          </h2>
-          <p className="text-slate-400 text-sm md:text-base">
-            Explore Robot Components
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
-          {robotParts.map((part, index) => (
-            <div
-              key={index}
-              className="p-4 md:p-6 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition flex flex-col items-center text-center group cursor-pointer"
-            >
-              <div className="text-2xl md:text-3xl mb-2 md:mb-3 text-cyan-400 group-hover:scale-110 transition-transform">
-                {part.icon}
-              </div>
-              <h3 className="font-bold text-slate-200 mb-1 text-sm md:text-base">
-                {part.name}
-              </h3>
-              <p className="text-[10px] md:text-xs text-slate-500">
-                {part.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 4. 3D Simulator Section */}
-      <section
-        id="simulator"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-slate-900"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="order-2 lg:order-1">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">
-              Realistic 3D Simulator Environment
-            </h2>
-            <ul className="space-y-3 md:space-y-4 text-slate-300 text-sm md:text-base">
-              <li className="flex items-start gap-3">
-                <span className="text-emerald-400 mt-1">✓</span>
-                <span>
-                  <strong>Physics Engine:</strong> Calculate gravity, road
-                  friction and engine collisions in real-time.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-emerald-400 mt-1">✓</span>
-                <span>
-                  <strong>Sensor Feedback:</strong> The sensor returns distance
-                  and tilt data according to real coordinates.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-emerald-400 mt-1">✓</span>
-                <span>
-                  <strong>Customized environment:</strong> Test the robot in
-                  complex mazes, tracks or obstacles.
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="order-1 lg:order-2 h-64 md:h-72 rounded-2xl bg-linear-to-br from-slate-900 to-slate-800 border border-slate-700 flex flex-col items-center justify-center p-6 text-center">
-            <span className="text-4xl md:text-5xl mb-4">🧊</span>
-            <p className="text-slate-300 font-semibold">
-              Interactive 3D Viewport
+            <p className="text-slate-600 text-base sm:text-lg mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Trải nghiệm quy trình chế tạo robot thực tế: từ lắp ghép linh kiện modular, căn chỉnh toạ độ không gian 3D đến lập trình thuật toán và kiểm thử vật lý ngay trong trình duyệt.
             </p>
-            <p className="text-xs text-slate-500 mt-2 max-w-xs">
-              WebGL/Three.js integration for a smooth experience on any device.
-            </p>
-          </div>
-        </div>
-      </section>
 
-      {/* 5. Built For Learning Section */}
-      <section
-        id="built-for-learning"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-slate-900 bg-slate-900/30"
-      >
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block px-3 py-1 rounded-full bg-cyan-950 text-cyan-400 text-xs font-semibold mb-6 border border-cyan-800">
-            Built for Learning
-          </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8">
-            Learn robotics by building.
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 text-left">
-            {[
-              {
-                desc: "Instead of reading about motors...",
-                highlight: "Build one.",
-              },
-              {
-                desc: "Instead of learning sensors...",
-                highlight: "Simulate one.",
-              },
-              {
-                desc: "Instead of imagining algorithms...",
-                highlight: "Watch it execute.",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="p-5 md:p-6 rounded-xl bg-slate-950 border border-slate-800"
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
+              <Link
+                href="/builder"
+                className="group inline-flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-md shadow-cyan-600/25 transition"
               >
-                <p className="text-slate-400 text-xs md:text-sm mb-2">
-                  {item.desc}
-                </p>
-                <p className="text-cyan-400 font-bold text-sm md:text-base">
-                  {item.highlight}
-                </p>
-              </div>
-            ))}
+                <span>Bắt đầu chế tạo ngay</span>
+                <ArrowRight
+                  size={16}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </Link>
+              <a
+                href="#simulator"
+                className="inline-flex items-center justify-center gap-2 border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 rounded-xl transition"
+              >
+                <span>Khám phá 3D Simulator</span>
+              </a>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs font-medium text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-600" />
+                Miễn phí 100%
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Activity size={14} className="text-cyan-600" />
+                Rapier Physics 60 FPS
+              </span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck size={14} className="text-indigo-600" />
+                Không lo chập cháy
+              </span>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6">
+            <div className="relative">
+              <CodeIdePreview />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 6. Footer CTA */}
-      <section className="border-t border-slate-900 bg-linear-to-b from-slate-950 to-cyan-950/30 py-16 md:py-20 text-center px-4 md:px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold mb-4">
-            Ready to bring your robot to life?
+      {/* HOW IT WORKS (OPEN TIMELINE, NO CARDS) */}
+      <section id="how-it-works" className="border-t border-slate-200 bg-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-xl mb-14">
+            <p className="text-xs font-bold tracking-wider uppercase text-cyan-700 mb-2">
+              Quy trình phát triển
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 mb-3">
+              Quy trình 3 bước từ ý tưởng đến thực tế
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base">
+              Học robotics bài bản thông qua chu trình khép kín, không đòi hỏi cài đặt phức tạp.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
+            <div className="border-t-2 border-cyan-600 pt-6">
+              <span className="font-mono text-xs font-bold text-cyan-700 tracking-widest uppercase mb-2 block">
+                BƯỚC 01
+              </span>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                Thiết kế 3D Modular
+              </h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Lựa chọn khung xe, gắn bánh xe, bố trí cảm biến khoảng cách và căn chỉnh toạ độ X, Y, Z với trục Gizmo trực quan.
+              </p>
+            </div>
+
+            <div className="border-t-2 border-indigo-600 pt-6">
+              <span className="font-mono text-xs font-bold text-indigo-700 tracking-widest uppercase mb-2 block">
+                BƯỚC 02
+              </span>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                Lập trình Hành vi
+              </h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Thiết lập vận tốc motor, thu nhận dữ liệu cảm biến LIDAR và xây dựng thuật toán tự động né tránh chướng ngại vật.
+              </p>
+            </div>
+
+            <div className="border-t-2 border-emerald-600 pt-6">
+              <span className="font-mono text-xs font-bold text-emerald-700 tracking-widest uppercase mb-2 block">
+                BƯỚC 03
+              </span>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                Mô phỏng Vật lý 60 FPS
+              </h3>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Khởi chạy không gian Rapier Physics: mô phỏng trọng lực, ma sát mặt sàn, khớp cơ khí và đánh giá phản xạ của robot.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* COST COMPARISON (OPEN LEDGER TABLE, NO NESTED CARDS) */}
+      <section id="no-hardware" className="border-t border-slate-200 py-16 md:py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-2xl mb-12">
+            <p className="text-xs font-bold tracking-wider uppercase text-cyan-700 mb-2">
+              Tối ưu chi phí
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 mb-3">
+              Bắt đầu học Robotics không tốn 1 đồng phần cứng
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+              Thoải mái thử nghiệm, sai và sửa không giới hạn mà không cần chờ đợi giao hàng linh kiện hay lo lắng về hỏng hóc thiết bị.
+            </p>
+          </div>
+
+          <div className="max-w-4xl bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div className="grid grid-cols-12 px-6 py-4 bg-slate-100/70 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-600">
+              <div className="col-span-6 sm:col-span-7">Hạng mục linh kiện / Trải nghiệm</div>
+              <div className="col-span-3 sm:col-span-2 text-right">Truyền thống</div>
+              <div className="col-span-3 text-right text-cyan-800">RoboSim3D</div>
+            </div>
+
+            <div className="divide-y divide-slate-100 text-sm">
+              {comparisonRows.map((row) => (
+                <div
+                  key={row.item}
+                  className="grid grid-cols-12 px-6 py-3.5 items-center hover:bg-slate-50/60 transition"
+                >
+                  <div className="col-span-6 sm:col-span-7 font-medium text-slate-800">
+                    {row.item}
+                  </div>
+                  <div className="col-span-3 sm:col-span-2 text-right text-slate-400 line-through font-mono text-xs">
+                    {row.traditional}
+                  </div>
+                  <div className="col-span-3 text-right font-bold text-cyan-700 text-xs sm:text-sm">
+                    {row.robosim}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-12 px-6 py-5 bg-cyan-50/50 border-t border-cyan-100 items-baseline">
+              <div className="col-span-6 sm:col-span-7 font-bold text-slate-900 text-sm sm:text-base">
+                Tổng chi phí để bắt đầu học hôm nay
+              </div>
+              <div className="col-span-3 sm:col-span-2 text-right text-slate-400 font-bold line-through font-mono text-sm">
+                ~500.000₫
+              </div>
+              <div className="col-span-3 text-right text-2xl font-black text-cyan-700 font-mono">
+                0₫
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ROBOT PARTS CATALOG (MINIMALIST REFINED LIST, NO BULKY CARDS) */}
+      <section id="library" className="border-t border-slate-200 bg-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-2xl mb-12">
+            <p className="text-xs font-bold tracking-wider uppercase text-cyan-700 mb-2">
+              Thư viện phần cứng mô phỏng
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 mb-3">
+              Linh kiện chuẩn xác, sẵn sàng lắp ghép
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base">
+              Mỗi linh kiện đều được cấu hình các thuộc tính vật lý tương ứng với thông số thực tế ngoài đời.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
+            {robotParts.map((part) => {
+              const Icon = part.icon;
+              return (
+                <div
+                  key={part.name}
+                  className="group border-b border-slate-200 pb-6 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition">
+                        <Icon size={16} />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-base">
+                          {part.name}
+                        </h3>
+                        <span className="text-[11px] font-semibold text-cyan-700">
+                          {part.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                      {part.desc}
+                    </p>
+                  </div>
+
+                  <div className="text-[11px] font-mono text-slate-400">
+                    {part.specs}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 3D SIMULATOR FEATURES (OPEN SPLIT VIEW) */}
+      <section id="simulator" className="border-t border-slate-200 py-16 md:py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-6">
+              <p className="text-xs font-bold tracking-wider uppercase text-cyan-700 mb-2">
+                Không gian 3D tương tác
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 mb-6 leading-tight">
+                Môi trường mô phỏng vật lý chân thực và tức thì
+              </h2>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cyan-600" />
+                    Động cơ Vật lý Rapier chuẩn xác
+                  </h3>
+                  <p className="text-sm text-slate-600 leading-relaxed pl-4">
+                    Tính toán ma sát bề mặt, trọng lực thực tế và khớp quay Revolute Joint với mô-men lực tùy chỉnh cho từng bánh xe.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600" />
+                    Cảm biến Raycasting thời gian thực
+                  </h3>
+                  <p className="text-sm text-slate-600 leading-relaxed pl-4">
+                    Tia laser quét khoảng cách liên tục 60Hz, trả về tọa độ va chạm và tự động kích hoạt chế độ phanh an toàn.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    Góc nhìn 360° & Gizmo 3D trực quan
+                  </h3>
+                  <p className="text-sm text-slate-600 leading-relaxed pl-4">
+                    Dễ dàng xoay camera, phóng to/thu nhỏ, căn chỉnh toạ độ X, Y, Z của từng linh kiện với công cụ Translate và Rotate.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* DARK TERMINAL TELEMETRY */}
+            <div className="lg:col-span-6 bg-slate-950 rounded-2xl p-6 text-slate-200 border border-slate-800 shadow-xl">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-mono text-xs font-bold text-emerald-400">
+                    SIMULATION_TELEMETRY
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-slate-500">60 FPS · ACTIVE</span>
+              </div>
+
+              <div className="space-y-2.5 font-mono text-xs">
+                <div className="py-2 px-3 bg-slate-900/90 rounded border border-slate-800/80 flex justify-between items-center">
+                  <span className="text-slate-400">CHASSIS_POSITION</span>
+                  <span className="text-cyan-400 font-bold">X: 0.00 | Y: 0.50 | Z: 1.25</span>
+                </div>
+                <div className="py-2 px-3 bg-slate-900/90 rounded border border-slate-800/80 flex justify-between items-center">
+                  <span className="text-slate-400">RAYCAST_DISTANCE</span>
+                  <span className="text-emerald-400 font-bold">2.45m / 5.0m (CLEAR)</span>
+                </div>
+                <div className="py-2 px-3 bg-slate-900/90 rounded border border-slate-800/80 flex justify-between items-center">
+                  <span className="text-slate-400">LEFT_MOTOR_SPEED</span>
+                  <span className="text-amber-400 font-bold">10.0 rad/s</span>
+                </div>
+                <div className="py-2 px-3 bg-slate-900/90 rounded border border-slate-800/80 flex justify-between items-center">
+                  <span className="text-slate-400">RIGHT_MOTOR_SPEED</span>
+                  <span className="text-amber-400 font-bold">10.0 rad/s</span>
+                </div>
+                <div className="py-2 px-3 bg-slate-900/90 rounded border border-slate-800/80 flex justify-between items-center">
+                  <span className="text-slate-400">SAFETY_BRAKE</span>
+                  <span className="text-emerald-400 font-bold">DISENGAGED (READY)</span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-slate-800 text-center">
+                <Link
+                  href="/builder"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300 transition"
+                >
+                  <span>Mở bảng điều khiển 3D Builder đầy đủ</span>
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BUILT FOR LEARNING (EDITORIAL QUOTE STYLE, NO REPETITIVE BOXES) */}
+      <section id="built-for-learning" className="border-t border-slate-200 bg-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-2xl mb-12">
+            <p className="text-xs font-bold tracking-wider uppercase text-cyan-700 mb-2">
+              Phương pháp giáo dục
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 mb-3">
+              Học robotics qua trải nghiệm tương tác
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base">
+              Hiểu sâu bản chất cơ điện tử bằng cách trực tiếp thao tác và quan sát phản hồi trong môi trường 3D.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl">
+            <div className="border-l-2 border-amber-500 pl-5">
+              <p className="text-slate-500 text-sm mb-1.5">
+                Thay vì chỉ đọc lý thuyết về động cơ DC...
+              </p>
+              <p className="text-slate-900 font-bold text-base leading-snug">
+                Tự tay gắn bánh xe và điều chỉnh vận tốc góc tức thì.
+              </p>
+            </div>
+
+            <div className="border-l-2 border-rose-500 pl-5">
+              <p className="text-slate-500 text-sm mb-1.5">
+                Thay vì phỏng đoán phản xạ của cảm biến...
+              </p>
+              <p className="text-slate-900 font-bold text-base leading-snug">
+                Quan sát trực tiếp tia laser quét và tọa độ va chạm.
+              </p>
+            </div>
+
+            <div className="border-l-2 border-cyan-600 pl-5">
+              <p className="text-slate-500 text-sm mb-1.5">
+                Thay vì mơ hồ về thuật toán điều khiển...
+              </p>
+              <p className="text-slate-900 font-bold text-base leading-snug">
+                Xem robot phản xạ và né vật cản từng mili-giây.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA SECTION (OPEN & SPACIOUS) */}
+      <section className="border-t border-slate-200 py-16 md:py-24 bg-slate-900 text-white text-center">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+            Sẵn sàng tạo ra Robot đầu tiên của bạn?
           </h2>
-          <p className="text-slate-400 mb-8 text-base md:text-lg">
-            Start modeling, programming algorithms, and simulations completely
-            free right in your browser.
+          <p className="text-slate-400 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+            Mở trình thiết kế 3D hoàn toàn miễn phí ngay trên trình duyệt. Không cần cài đặt, không cần mua phần cứng.
           </p>
           <Link
             href="/builder"
-            className="w-full sm:w-auto inline-block bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-base md:text-lg px-8 py-4 rounded-xl transition shadow-xl shadow-cyan-500/20"
+            className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-base md:text-lg px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/20 transition hover:scale-105"
           >
-            Create first robot
+            <span>Mở 3D Robot Builder</span>
+            <ArrowRight size={18} />
           </Link>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 bg-white py-8 text-slate-500 text-xs">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-slate-900">
+              RoboSim<span className="text-cyan-600">3D</span>
+            </span>
+            <span className="text-slate-400">·</span>
+            <span>Nền tảng học tập & mô phỏng Robotics trực tuyến</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href="/builder" className="hover:text-cyan-700 transition">
+              Builder
+            </Link>
+            <a href="#simulator" className="hover:text-cyan-700 transition">
+              Simulator
+            </a>
+            <a href="#how-it-works" className="hover:text-cyan-700 transition">
+              Quy trình
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

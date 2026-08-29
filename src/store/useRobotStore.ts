@@ -48,7 +48,7 @@ export const useRobotStore = create<RobotState>((set, get) => ({
       name: `${catalogItem.defaultName} ${get().parts.filter(p => p.type === type).length + 1}`,
       position: catalogItem.defaultPosition || [0, 1, 0],
       rotation: [0, 0, 0],
-      scale: [1, 1, 1],
+      scale: catalogItem.defaultScale || [1, 1, 1],
       parentId: null, //get().selectedPartId || null, 
       properties: { ...catalogItem.defaultProperties },
     };

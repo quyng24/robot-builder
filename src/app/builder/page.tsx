@@ -2,6 +2,7 @@ import SidebarLeft from "@/components/builder/editor/SidebarLeft";
 import SidebarRight from "@/components/builder/editor/SidebarRight";
 import Topbar from "@/components/builder/editor/Topbar";
 import Viewport from "@/components/builder/editor/Viewport";
+import Header from "@/components/honepage/Header";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -15,30 +16,53 @@ export default async function BuilderPage() {
 
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center text-slate-100">
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md shadow-2xl relative overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/20 blur-3xl rounded-full"></div>
+      <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-cyan-100 selection:text-cyan-900 flex flex-col">
+        <Header ctaHref="/" ctaLabel="Về trang chủ" />
 
-          <span className="text-6xl mb-4 block">💻</span>
-          <h1 className="text-2xl font-bold text-cyan-400 mb-3">
-            Cần màn hình lớn hơn
-          </h1>
-          <p className="text-slate-400 mb-8 leading-relaxed text-sm">
-            Trình giả lập 3D và môi trường lập trình (Builder) yêu cầu không
-            gian màn hình rộng và chuột để tương tác tốt nhất. <br />
-            <br />
-            Vui lòng truy cập lại trang này bằng{" "}
-            <strong>Laptop, PC hoặc Tablet</strong> để bắt đầu chế tạo robot.
-          </p>
-          <Link
-            href="/"
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl transition shadow-lg shadow-cyan-500/20 block w-full"
-          >
-            Quay lại Trang chủ
-          </Link>
+        <div className="flex-1 max-w-2xl mx-auto px-4 md:px-6 py-12 md:py-20 flex flex-col justify-center">
+          <div className="border-l-4 border-cyan-600 pl-6 py-2">
+            <span className="font-mono text-xs font-bold text-cyan-700 uppercase tracking-widest block mb-2">
+              THÔNG BÁO TƯƠNG THÍCH
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-950 mb-4 leading-tight">
+              Trải nghiệm 3D Builder trên Máy tính hoặc Laptop
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+              Không gian thiết kế 3D và môi trường giả lập vật lý Rapier đòi hỏi không gian hiển thị rộng cùng thao tác chuột để kéo thả linh kiện, căn chỉnh trục Gizmo và quan sát dữ liệu cảm biến thời gian thực.
+            </p>
+
+            <ul className="space-y-2.5 text-xs text-slate-600 mb-8 border-t border-slate-200 pt-5">
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-600" />
+                <span>Thao tác xoay camera 3D và căn chỉnh toạ độ X, Y, Z đa trục</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-600" />
+                <span>Theo dõi dữ liệu cảm biến LIDAR và tốc độ motor 60 FPS</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-600" />
+                <span>Quản lý cây phân cấp linh kiện và thông số vật lý</span>
+              </li>
+            </ul>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl shadow-sm shadow-cyan-600/25 transition text-sm"
+              >
+                <span>Về trang chủ</span>
+              </Link>
+              <Link
+                href="/#simulator"
+                className="inline-flex items-center justify-center gap-2 border border-slate-300 hover:border-slate-400 bg-white text-slate-700 font-semibold px-6 py-3 rounded-xl transition text-sm"
+              >
+                <span>Xem giới thiệu 3D Simulator</span>
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
   return (

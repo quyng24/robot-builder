@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import { useRobotStore } from "@/store/useRobotStore";
 import { Move3d, Rotate3d } from "lucide-react";
+import SimulationHud from "./SimulationHud";
 
 const Scene3D = dynamic(() => import("../3d/Scene3D"), {
   ssr: false,
@@ -21,17 +22,16 @@ export default function Viewport() {
       {/* 3D Space */}
       <Scene3D />
 
-      {/* OVERLAY UI */}
-      <div className="absolute top-4 left-4 z-10 pointer-events-none">
-        <p className="text-slate-600 font-mono text-sm tracking-widest">
-          3D_VIEWPORT
-        </p>
-        <p
-          className={`text-xs font-bold mt-1 ${mode === "build" ? "text-indigo-500" : "text-emerald-500"}`}
-        >
-          MODE: {mode.toUpperCase()}
-        </p>
-      </div>
+      {mode === "simulate" ? (
+        <SimulationHud />
+      ) : (
+        <div className="absolute top-4 left-4 z-10 pointer-events-none">
+          <p className="text-slate-600 font-mono text-sm tracking-widest">
+            3D_VIEWPORT
+          </p>
+          <p className="text-xs font-bold mt-1 text-indigo-500">MODE: BUILD</p>
+        </div>
+      )}
 
       {mode === "build" && selectedPartId && (
         <div className="absolute top-4 right-4 z-10 flex bg-slate-900 border border-slate-700 rounded-lg p-1 shadow-xl">

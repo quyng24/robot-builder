@@ -1,9 +1,11 @@
 "use client";
 
 import { ChangeEvent, useRef, useState } from "react";
-import { Play, Hammer, Save, FolderOpen } from "lucide-react";
+import { Save, FolderOpen } from "lucide-react";
+import { leaveSimulationSession } from "@/simulation";
 import { useRobotStore } from "@/store/useRobotStore";
 import { RobotPart, Vector3D } from "@/types/robot";
+import SimulationTransport from "./SimulationTransport";
 
 const DEFAULT_PROJECT_NAME = "My_First_Rover";
 
@@ -49,7 +51,7 @@ function getProjectName(name: string) {
 }
 
 export default function Topbar() {
-  const { mode, parts, setMode, loadProject } = useRobotStore();
+  const { parts, loadProject } = useRobotStore();
   const [projectName, setProjectName] = useState(DEFAULT_PROJECT_NAME);
   const [status, setStatus] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +92,7 @@ export default function Topbar() {
       }
 
       loadProject(project.parts);
+      leaveSimulationSession();
       setProjectName(getProjectName(project.name || file.name));
       setStatus("Project opened");
     } catch {
@@ -116,20 +119,7 @@ export default function Topbar() {
         </label>
       </div>
 
-      <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
-        <button
-          onClick={() => setMode("build")}
-          className={`flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md transition-all ${mode === "build" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
-        >
-          <Hammer size={14} /> Build Mode
-        </button>
-        <button
-          onClick={() => setMode("simulate")}
-          className={`flex items-center gap-2 px-3 py-1 text-xs font-medium rounded-md transition-all ${mode === "simulate" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-white"}`}
-        >
-          <Play size={14} /> Run Emulator
-        </button>
-      </div>
+      <SimulationTransport />
 
       <div className="flex items-center gap-2">
         <span aria-live="polite" className="text-xs text-slate-400">

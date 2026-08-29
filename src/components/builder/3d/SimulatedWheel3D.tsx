@@ -1,14 +1,17 @@
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
 import {
   RigidBody,
   RapierRigidBody,
   useRevoluteJoint,
   interactionGroups,
+  useBeforePhysicsStep,
 } from "@react-three/rapier";
+import { getSimulationState } from "@/simulation";
+import { usePublishRigidBody } from "@/simulation/bridge/usePublishRigidBody";
 import { useRobotStore } from "@/store/useRobotStore";
 import { RobotPart } from "@/types/robot";
+import WheelVisual3D from "./parts/WheelVisual3D";
 
 interface Props {
   part: RobotPart;
@@ -17,10 +20,10 @@ interface Props {
 }
 
 export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
-  const isBlocked = useRobotStore((state) => state.isBlocked);
   const mode = useRobotStore((state) => state.mode);
 
   const wheelRef = useRef<RapierRigidBody>(null!);
+  usePublishRigidBody(part.id, part.type, wheelRef);
 
   const localAnchor = useMemo(() => {
     const chassisPos = new THREE.Vector3(...chassis.position);
@@ -37,13 +40,28 @@ export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
     [1, 0, 0],
   ]);
 
-  useFrame(() => {
+  useBeforePhysicsStep(() => {
     if (mode === "build") return;
 
+    const world = getSimulationState();
+    const blocked = world.isRobotBlocked();
+    const motor = world.getMotor(part.id);
+
+    const requestedSpeed =
+      motor?.targetSpeed ?? (Number(part.properties.maxSpeed) || 15);
+    const motorEnabled = motor?.enabled ?? true;
+    const appliedSpeed = !motorEnabled || blocked ? 0 : requestedSpeed;
+
     if (joint.current) {
-      const targetSpeed = isBlocked ? 0 : 15;
-      joint.current.configureMotorVelocity(targetSpeed, isBlocked ? 200 : 50);
+      joint.current.configureMotorVelocity(appliedSpeed, blocked ? 200 : 50);
     }
+
+    world.upsertMotor({
+      id: part.id,
+      targetSpeed: requestedSpeed,
+      appliedSpeed,
+      enabled: motorEnabled,
+    });
   });
 
   const bodyType = mode === "build" ? "kinematicPosition" : "dynamic";
@@ -60,23 +78,7 @@ export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
       restitution={0}
       friction={1.5}
     >
-      <mesh
-        scale={part.scale}
-        rotation={[0, 0, Math.PI / 2]}
-        castShadow
-        receiveShadow
-      >
-        <cylinderGeometry args={[1, 1, 1, 32]} />
-        <meshStandardMaterial
-          color={part.properties.color || "#333333"}
-          roughness={0.9}
-        />
-
-        <mesh position={[0.5, 0, 0]}>
-          <boxGeometry args={[0.1, 1.01, 0.1]} />
-          <meshBasicMaterial color="red" />
-        </mesh>
-      </mesh>
+      <WheelVisual3D part={part} />
     </RigidBody>
   );
 }
