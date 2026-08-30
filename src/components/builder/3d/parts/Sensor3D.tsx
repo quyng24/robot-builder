@@ -141,6 +141,10 @@ export default function Sensor3D({
       ref={sensorRef}
       position={[localPos.x, localPos.y, localPos.z]}
       rotation={[localEuler.x, localEuler.y, localEuler.z]}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (mode === 'build') selectPart(part.id)
+      }}
     >
       <sphereGeometry args={[0.3, 16, 16]} />
       <meshStandardMaterial ref={sensorMatRef} color="#94a3b8" />
@@ -148,10 +152,6 @@ export default function Sensor3D({
       <mesh
         position={[0, 0, sensorRange / 2]}
         rotation={[Math.PI / 2, 0, 0]}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (mode === 'build') selectPart(part.id)
-        }}
       >
         <cylinderGeometry args={[0.02, 0.02, sensorRange]} />
         <meshBasicMaterial
