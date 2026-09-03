@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { RobotPart, PartType, Vector3D } from '@/types/robot';
+import { RobotPart, PartType, Vector3D, MotorConfig } from '@/types/robot';
 import { PART_CATALOG } from '@/lib/catalog';
 
 interface RobotState {
@@ -20,6 +20,7 @@ interface RobotState {
   updateName: (id: string, name: string) => void;
   updateTransform: (id: string, transform: { position?: Vector3D; rotation?: Vector3D; scale?: Vector3D }) => void;
   updateProperties: (id: string, properties: Record<string, any>) => void;
+  updateMotorConfig: (id: string, config: Partial<MotorConfig>) => void;
   setParent: (childId: string, parentId: string | null) => void;
   loadProject: (parts: RobotPart[]) => void;
 }
@@ -99,6 +100,17 @@ export const useRobotStore = create<RobotState>((set, get) => ({
       )
     }));
   },
+
+  updateMotorConfig: (id, config) => set((state) => ({
+    parts: state.parts.map((part) => 
+    part.id === id ? {
+      ...part,
+      motorConfig: {
+        ...(part.motorConfig || {isEnable: true, driveSide: 'none', maxSpeed: 10, maxTorque: 10}),
+        ...config
+      }
+    } : part)
+  })),
 
   setParent: (childId, parentId) => {
     set((state) => ({

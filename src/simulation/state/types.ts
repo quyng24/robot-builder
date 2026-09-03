@@ -13,23 +13,29 @@ export interface BodyState {
 export interface SensorReading {
   id: string;
   range: number;
-  /** Hit distance in meters, or null when the ray misses. */
   distance: number | null;
   blocked: boolean;
 }
 
+export interface ControllerInput {
+  linear: number;
+  angular: number;
+  manualBrake: boolean;
+}
+
 export interface MotorCommand {
   id: string;
-  /** Requested angular speed from the controller. */
   targetSpeed: number;
-  /** Speed actually applied after sensor/motor safety checks. */
   appliedSpeed: number;
   enabled: boolean;
+  actualSpeed?: number;
+  actualTorque?: number;
 }
 
 export interface SimulationWorldSnapshot {
   tick: SimulationTick | null;
-  robotBlocked: boolean;
+  autoBraking: boolean;
+  controllerInput: ControllerInput;
   bodies: Record<string, BodyState>;
   sensors: Record<string, SensorReading>;
   motors: Record<string, MotorCommand>;

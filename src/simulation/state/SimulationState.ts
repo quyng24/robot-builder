@@ -2,6 +2,7 @@ import type { RobotPart, Vector3D } from "@/types/robot";
 import type { SimulationTick } from "../types";
 import type {
   BodyState,
+  ControllerInput,
   MotorCommand,
   SensorReading,
   SimulationWorldSnapshot,
@@ -24,7 +25,12 @@ function cloneVec(v: Vector3D): Vector3D {
  */
 export class SimulationState {
   private tick: SimulationTick | null = null;
-  private robotBlocked = false;
+  private autoBraking = false;
+  private controllerInput: ControllerInput = {
+    linear: 0,
+    angular: 0,
+    manualBrake: false,
+  }
   private readonly bodies = new Map<string, BodyState>();
   private readonly sensors = new Map<string, SensorReading>();
   private readonly motors = new Map<string, MotorCommand>();
@@ -34,7 +40,8 @@ export class SimulationState {
     this.bodies.clear();
     this.sensors.clear();
     this.motors.clear();
-    this.robotBlocked = false;
+    this.autoBraking = false;
+    this.controllerInput = {linear: 0, angular: 0, manualBrake: false};
     this.tick = { step: 0, elapsed: 0, dt: 0 };
 
     for (const part of parts) {
@@ -50,7 +57,7 @@ export class SimulationState {
       if (part.type === "sensor") {
         this.sensors.set(part.id, {
           id: part.id,
-          range: Number(part.properties.range) || 5,
+          range: Number(part.properties?.range) || 5,
           distance: null,
           blocked: false,
         });
@@ -59,9 +66,9 @@ export class SimulationState {
       if (part.type === "wheel") {
         this.motors.set(part.id, {
           id: part.id,
-          targetSpeed: Number(part.properties.maxSpeed) || 15,
+          targetSpeed: 0,
           appliedSpeed: 0,
-          enabled: true,
+          enabled: part.motorConfig?.driveSide !== "none",
         });
       }
     }
@@ -100,8 +107,16 @@ export class SimulationState {
     this.motors.set(command.id, { ...command });
   }
 
+  setControllerInput(input: Partial<ControllerInput>): void {
+    this.controllerInput = {...this.controllerInput, ...input};
+  }
+
+  getControllerInput(): ControllerInput {
+    return { ...this.controllerInput };
+  }
+  
   setRobotBlocked(blocked: boolean): void {
-    this.robotBlocked = blocked;
+    this.autoBraking = blocked;
   }
 
   getBody(id: string): BodyState | undefined {
@@ -117,7 +132,7 @@ export class SimulationState {
   }
 
   isRobotBlocked(): boolean {
-    return this.robotBlocked;
+    return this.autoBraking;
   }
 
   getSnapshot(): SimulationWorldSnapshot {
@@ -143,7 +158,8 @@ export class SimulationState {
 
     return {
       tick: this.tick ? { ...this.tick } : null,
-      robotBlocked: this.robotBlocked,
+      autoBraking: this.autoBraking,
+      controllerInput: {...this.controllerInput},
       bodies,
       sensors,
       motors,
@@ -159,7 +175,8 @@ export class SimulationState {
 
   clear(): void {
     this.tick = null;
-    this.robotBlocked = false;
+    this.autoBraking = false;
+    this.controllerInput = { linear: 0, angular: 0, manualBrake: false};
     this.bodies.clear();
     this.sensors.clear();
     this.motors.clear();

@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useRobotStore } from "@/store/useRobotStore";
 import { Move3d, Rotate3d } from "lucide-react";
 import SimulationHud from "./SimulationHud";
+import { useKeyboardController } from "@/simulation/bridge/useKeyboardController";
 
 const Scene3D = dynamic(() => import("../3d/Scene3D"), {
   ssr: false,
@@ -16,6 +17,7 @@ const Scene3D = dynamic(() => import("../3d/Scene3D"), {
 export default function Viewport() {
   const { mode, parts, transformMode, setTransformMode, selectedPartId } =
     useRobotStore();
+  useKeyboardController(mode === "simulate");
   const selectedPartData = parts.find((p) => p.id === selectedPartId);
   return (
     <main className="flex-1 bg-slate-950 relative flex items-center justify-center group">

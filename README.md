@@ -4,77 +4,112 @@
 
 ---
 
+## 📍 Project Status
+
+**Current phase:** Core Simulation
+
+### ✅ Completed
+
+- 3D Robot Builder & Component Library
+- Translate / Rotate bằng Gizmo và Properties Panel
+- Robot Data Model & Robot Tree
+- Rapier Physics: Gravity, Friction, Collision
+- Wheel Motor & Revolute Joint
+- Distance Sensor & Automatic Brake
+- Simulation Transport: Run / Pause / Step / Reset / Stop
+- Simulation State & Fixed Timestep (60Hz)
+- Real-time Simulation HUD & Telemetry
+- Debug Mode: Sensor Ray / Simulation Data
+
+### 🚧 Next
+
+- Independent Motor Control
+- Multiple Sensor System
+- Environment Editor
+- Robot Programming API
+- Command / Script System
+
+---
+
 ## ✨ Tính năng chính
 
-- **3D Robot Builder:**
-  - Thư viện linh kiện: Chassis (khung gầm), Wheel (bánh xe), Distance Sensor (cảm biến khoảng cách), Wall (tường chắn), Box.
-  - Công cụ căn chỉnh không gian 3D: Di chuyển (Translate) và Xoay (Rotate) linh kiện trực quan với Gizmo.
-  - Cây phân cấp linh kiện (Robot Tree) và bảng cấu hình thông số (Properties Panel).
-- **Mô phỏng Vật lý Thời gian thực (Rapier Physics):**
-  - Động cơ bánh xe (Revolute Joints & Motor Velocity).
-  - Tác động trọng lực, ma sát và va chạm vật cản/mặt sàn.
-  - Cảm biến khoảng cách (Raycasting) quét vật cản và kích hoạt cơ chế phanh an toàn.
-  - Bộ điều khiển mô phỏng (Simulation Transport): Run, Pause, Step từng tick, Reset, Stop.
-  - Simulation HUD hiển thị dữ liệu telemetry thời gian thực (vị trí chassis, khoảng cách cảm biến, tốc độ động cơ).
-- **Quản lý Dự án:** Lưu (Export) và nạp lại (Import) bản thiết kế robot dưới dạng file `.json`.
+### 3D Robot Builder
+
+- Thư viện linh kiện: Chassis, Wheel, Distance Sensor, Wall, Box.
+- Di chuyển và xoay linh kiện trong không gian 3D.
+- Robot Tree và Properties Panel.
+
+### 3D Physics Simulator
+
+- Rapier Physics với Gravity, Friction và Collision.
+- Wheel Motor sử dụng Revolute Joint.
+- Distance Sensor sử dụng Raycasting.
+- Cơ chế phanh tự động khi phát hiện vật cản.
+- Fixed timestep simulation với Run / Pause / Step / Reset / Stop.
+- Simulation HUD hiển thị telemetry realtime.
+- Debug mode hỗ trợ quan sát Sensor Ray và simulation state.
+
+### Project Management
+
+- Export / Import robot dưới dạng `.json`.
+- Schema version hiện tại: v1.
 
 ---
 
-## 🛠 Công nghệ sử dụng
+## 🛠 Công nghệ
 
-- **Frontend Core:** [Next.js 16](https://nextjs.org/) (App Router), [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/)
-- **3D & Physics Engine:** [Three.js](https://threejs.org/), [@react-three/fiber](https://r3f.docs.pmnd.rs/), [@react-three/drei](https://github.com/pmndrs/drei), [@react-three/rapier](https://github.com/pmndrs/react-three-rapier)
-- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
-- **UI & Styling:** [Tailwind CSS 4](https://tailwindcss.com/), [Lucide React](https://lucide.dev/)
+- **Frontend:** Next.js 16, React 19, TypeScript
+- **3D & Physics:** Three.js, React Three Fiber, Drei, React Three Rapier
+- **State:** Zustand
+- **UI:** Tailwind CSS 4, Lucide React
 
 ---
 
-## 🏗 Kiến trúc & Luồng dữ liệu (Architecture & Data Flow)
-
-Dự án được thiết kế theo mô hình phân tách tầng rõ ràng nhằm đảm bảo hiệu năng 60 FPS và dễ dàng mở rộng:
+## 🏗 Architecture
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│ 1. UI & Editor Layer (Zustand: useRobotStore)              │
-│    - Quản lý danh sách RobotPart, mode (Build/Simulate),   │
-│      selectedPartId, transformMode                         │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ (Hydrate khi bắt đầu mô phỏng)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 2. Simulation Core (Simulation.ts & Clock Loop)             │
-│    - Quản lý đồng hồ thời gian thực (Fixed timestep dt=1/60)│
-│    - Session Lifecycle: start, pause, resume, step, reset   │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ (Tick 60Hz)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 3. Physics & Bridge Layer (Rapier + SimulationState)        │
-│    - SimulationStepper: Điều phối bước chạy vật lý Rapier   │
-│    - usePublishRigidBody: Đồng bộ vị trí & vận tốc          │
-│    - Sensor3D: Raycasting phát hiện vật cản & kích hoạt     │
-│      tự động phanh (robotBlocked)                           │
-│    - SimulatedWheel3D: Điều khiển mô-men & vận tốc động cơ  │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ (Broadcast World Snapshot)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 4. Rendering & Telemetry Layer                              │
-│    - Three.js Viewport: Render chuyển động 3D               │
-│    - Simulation HUD: Hiển thị t, step, lidar, motor speed   │
-└─────────────────────────────────────────────────────────────┘
+UI & Editor
+│
+│ Robot Definition
+▼
+Simulation Core
+│
+│ Fixed Timestep 60Hz
+▼
+Physics & Simulation
+│
+├── Rapier Physics
+├── Motors
+├── Sensors
+└── Collision
+│
+▼
+Simulation State
+│
+├── Robot State
+├── Motor State
+└── Sensor State
+│
+▼
+3D Renderer + Telemetry
 ```
+
+**Data Separation**
+
+- Zustand: Robot design state.
+- SimulationState: Runtime simulation state.
+- Không cập nhật Zustand trực tiếp trong physics loop 60Hz.
 
 ---
 
-## 📁 Cấu trúc thư mục & Giải thích chi tiết
+## 📁 Project Structure
 
 ```text
 src/
 ├── app/                          # Next.js App Router
 │   ├── page.tsx                  # Landing page (SSR, giới thiệu nền tảng)
 │   ├── builder/page.tsx          # 3D Robot Builder (Desktop) & Fallback (Mobile)
-│   └── simulator/page.tsx        # Điều hướng nhanh tới Builder
+│   └── simulator/page.tsx
 │
 ├── components/
 │   ├── builder/
@@ -121,17 +156,14 @@ src/
 ## 🔑 Nguyên tắc thiết kế & Lưu ý cho Developer (Developer Guidelines)
 
 1. **Ranh giới dữ liệu (Separation of Concerns):**
-
    - Dữ liệu thiết kế tĩnh (linh kiện, màu sắc, vị trí ban đầu) được quản lý trong **Zustand** (`useRobotStore`).
    - Dữ liệu động khi mô phỏng (tọa độ di chuyển, vận tốc, khoảng cách tia laser, tốc độ motor) do **SimulationState** quản lý.
    - _Không gọi `set` trên Zustand bên trong vòng lặp vật lý 60Hz_ để tránh gây giật lag và re-render không cần thiết.
 
 2. **Đơn vị góc quay (Rotation):**
-
    - Mọi góc quay trong domain model (`RobotPart.rotation`) được lưu bằng **Radian (Euler)**. Chỉ chuyển đổi sang độ (°/degrees) khi hiển thị trên giao diện người dùng.
 
 3. **Cơ chế Va chạm (Collision Groups):**
-
    - `0`: Mặt sàn (Ground)
    - `1`: Khung xe (Chassis)
    - `2`: Bánh xe (Wheels)
@@ -143,15 +175,36 @@ src/
 
 ---
 
-## 🚀 Cài đặt & Khởi chạy
+## 🚀 Development
 
-```bash
-# 1. Cài đặt dependencies
-npm install
+- `npm install`
+- `npm run dev`  
+  Development server: http://localhost:3000
+- `npm run build`
 
-# 2. Chạy môi trường phát triển (http://localhost:3000)
-npm run dev
+---
 
-# 3. Build sản phẩm
-npm run build
-```
+## 🗺 Roadmap
+
+### ✅ Hoàn thành
+
+- Robot Builder
+- Robot Data Model
+- Physics Simulation
+- Motor & Sensor
+- Simulation State
+- Telemetry & Debug
+
+### 🔨 Đang phát triển
+
+- Motor Control
+- Sensor System
+- Environment Editor
+- Robot Programming
+- Challenge System
+
+### 🔮 Tương lai
+
+- Autonomous Robot
+- Advanced Robotics
+- AI Robot

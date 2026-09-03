@@ -13,6 +13,9 @@ import { useRobotStore } from "@/store/useRobotStore";
 import { RobotPart } from "@/types/robot";
 import WheelVisual3D from "./parts/WheelVisual3D";
 
+const clamp = (val: number, min: number, max: number) =>
+  Math.min(Math.max(val, min), max);
+
 interface Props {
   part: RobotPart;
   chassis: RobotPart;
@@ -45,22 +48,35 @@ export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
 
     const world = getSimulationState();
     const blocked = world.isRobotBlocked();
-    const motor = world.getMotor(part.id);
+    const input = world.getControllerInput();
+    const driveSide = part.motorConfig?.driveSide || "none";
+    const maxSpeed =
+      part.motorConfig?.maxSpeed ?? Number(part.properties?.maxSpeed) ?? 15;
+    const maxTorque = part.motorConfig?.maxTorque ?? 50;
 
-    const requestedSpeed =
-      motor?.targetSpeed ?? (Number(part.properties.maxSpeed) || 15);
-    const motorEnabled = motor?.enabled ?? true;
-    const appliedSpeed = !motorEnabled || blocked ? 0 : requestedSpeed;
+    let driveRatio = 0;
+    if (driveSide === "left") {
+      driveRatio = clamp(input.linear + input.angular, -1.0, 1.0);
+    } else if (driveSide === "right") {
+      driveRatio = clamp(input.linear - input.angular, -1.0, 1.0);
+    }
+
+    const requestedSpeed = driveRatio * maxSpeed;
+    const isBraking = blocked || input.manualBrake;
+    const appliedSpeed = isBraking ? 0 : requestedSpeed;
 
     if (joint.current) {
-      joint.current.configureMotorVelocity(appliedSpeed, blocked ? 200 : 50);
+      joint.current.configureMotorVelocity(
+        appliedSpeed,
+        isBraking ? 200 : maxTorque,
+      );
     }
 
     world.upsertMotor({
       id: part.id,
       targetSpeed: requestedSpeed,
-      appliedSpeed,
-      enabled: motorEnabled,
+      appliedSpeed: appliedSpeed,
+      enabled: driveSide !== "none",
     });
   });
 

@@ -25,4 +25,12 @@ export interface RobotPart {
   scale: Vector3D;
   parentId: string | null;
   properties: Record<string, any>;
+  motorConfig?: MotorConfig;
+}
+
+export interface MotorConfig {
+  isEnable: boolean;
+  driveSide: 'left' | 'right' | 'none';
+  maxSpeed: number;
+  maxTorque: number;
 }

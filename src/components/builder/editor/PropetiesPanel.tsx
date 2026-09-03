@@ -1,10 +1,16 @@
 "use client";
-import { Settings, Trash2 } from "lucide-react";
+import { Settings, Trash2, Cpu } from "lucide-react";
 import { useRobotStore } from "@/store/useRobotStore";
 
 export default function PropertiesPanel() {
-  const { parts, selectedPartId, removePart, updateTransform, updateName } =
-    useRobotStore();
+  const {
+    parts,
+    selectedPartId,
+    removePart,
+    updateTransform,
+    updateName,
+    updateMotorConfig,
+  } = useRobotStore();
   const selectedPartData = parts.find((p) => p.id === selectedPartId);
 
   return (
@@ -163,6 +169,43 @@ export default function PropertiesPanel() {
               />
             </div>
           </div>
+
+          {selectedPartData.type === "wheel" && (
+            <div className="mt-4 pt-3 border-t border-slate-800">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Cpu size={14} className="text-indigo-400" />
+                <label className="text-slate-400 font-medium text-xs">
+                  Motor Settings
+                </label>
+              </div>
+
+              <div className="space-y-2">
+                <div>
+                  <label className="text-slate-500 block mb-0.5 text-[10px]">
+                    DRIVE SIDE (L/R)
+                  </label>
+                  <select
+                    value={selectedPartData.motorConfig?.driveSide || "none"}
+                    onChange={(e) => {
+                      if (updateMotorConfig) {
+                        updateMotorConfig(selectedPartData.id, {
+                          driveSide: e.target.value as
+                            | "left"
+                            | "right"
+                            | "none",
+                        });
+                      }
+                    }}
+                    className="w-full bg-slate-950 border border-slate-800 rounded p-1.5 text-slate-200 outline-none focus:border-indigo-500"
+                  >
+                    <option value="none">None (Wheel freedom)</option>
+                    <option value="left">Left Motor (Drive left)</option>
+                    <option value="right">Right Motor (Drive right)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="pt-2">
             <button

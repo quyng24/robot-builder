@@ -13,7 +13,9 @@ export default function SimulationHud() {
   const world = useSimulationWorld();
   const sensors = Object.values(world.sensors);
   const motors = Object.values(world.motors);
-  const chassis = Object.values(world.bodies).find((body) => body.type === "chassis");
+  const chassis = Object.values(world.bodies).find(
+    (body) => body.type === "chassis",
+  );
 
   return (
     <div className="absolute top-4 left-4 z-10 pointer-events-none font-mono">
@@ -33,8 +35,10 @@ export default function SimulationHud() {
         </div>
         <div className="flex gap-2">
           <dt className="text-slate-600">blocked</dt>
-          <dd className={world.robotBlocked ? "text-red-400" : "text-emerald-500"}>
-            {world.robotBlocked ? "YES" : "NO"}
+          <dd
+            className={world.autoBraking ? "text-red-400" : "text-emerald-500"}
+          >
+            {world.autoBraking ? "YES" : "NO"}
           </dd>
         </div>
         {chassis && (
