@@ -32,16 +32,19 @@ export const useRobotStore = create<RobotState>((set, get) => ({
   transformMode: 'translate',
   isBlocked: false,
 
-  setIsBlocked: (blocked) => set({ isBlocked: blocked}),
+  setIsBlocked: (blocked) => set({ isBlocked: blocked }),
   setMode: (mode) => set({ mode }),
 
-  setTransformMode: (mode: any) => set({transformMode: mode}),
+  setTransformMode: (mode: any) => set({ transformMode: mode }),
   
   selectPart: (id) => set({ selectedPartId: id }),
 
   addPart: (type) => {
     const catalogItem = PART_CATALOG[type];
     if (!catalogItem) return;
+
+    const isWheel = catalogItem.type === 'wheel';
+    const wheelCount = get().parts.filter((p) => p.type === 'wheel').length;
 
     const newPart: RobotPart = {
       id: uuidv4(),
@@ -50,8 +53,16 @@ export const useRobotStore = create<RobotState>((set, get) => ({
       position: catalogItem.defaultPosition || [0, 1, 0],
       rotation: [0, 0, 0],
       scale: catalogItem.defaultScale || [1, 1, 1],
-      parentId: null, //get().selectedPartId || null, 
+      parentId: null,
       properties: { ...catalogItem.defaultProperties },
+      motorConfig: isWheel
+        ? {
+            isEnable: true,
+            driveSide: wheelCount % 2 === 0 ? 'left' : 'right',
+            maxSpeed: Number(catalogItem.defaultProperties?.maxSpeed) || 15,
+            maxTorque: Number(catalogItem.defaultProperties?.motorTorque) || 50,
+          }
+        : undefined,
     };
 
     set((state) => ({
@@ -80,8 +91,8 @@ export const useRobotStore = create<RobotState>((set, get) => ({
   },
 
   updateName: (id, name) => {
-    set((state) => ({parts: state.parts.map(part => part.id === id ? { ...part, name } : part)}));
-    },
+    set((state) => ({ parts: state.parts.map(part => part.id === id ? { ...part, name } : part) }));
+  },
 
   updateTransform: (id, transform) => {
     set((state) => ({
@@ -103,13 +114,14 @@ export const useRobotStore = create<RobotState>((set, get) => ({
 
   updateMotorConfig: (id, config) => set((state) => ({
     parts: state.parts.map((part) => 
-    part.id === id ? {
-      ...part,
-      motorConfig: {
-        ...(part.motorConfig || {isEnable: true, driveSide: 'none', maxSpeed: 10, maxTorque: 10}),
-        ...config
-      }
-    } : part)
+      part.id === id ? {
+        ...part,
+        motorConfig: {
+          ...(part.motorConfig || { isEnable: true, driveSide: 'none', maxSpeed: 15, maxTorque: 50 }),
+          ...config
+        }
+      } : part
+    )
   })),
 
   setParent: (childId, parentId) => {

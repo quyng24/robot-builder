@@ -49,19 +49,44 @@ export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
     const world = getSimulationState();
     const blocked = world.isRobotBlocked();
     const input = world.getControllerInput();
-    const driveSide = part.motorConfig?.driveSide || "none";
+
+    // Xác định driveSide:
+    // 1. Nếu đã cấu hình 'left' hoặc 'right': dùng trực tiếp.
+    // 2. Nếu chưa có motorConfig hoặc 'none': tự động nhận diện theo toạ độ localAnchor.x (< 0 là left, >= 0 là right)
+    const configuredSide = part.motorConfig?.driveSide;
+    const driveSide: "left" | "right" | "none" =
+      configuredSide && configuredSide !== "none"
+        ? configuredSide
+        : localAnchor.x < 0
+          ? "left"
+          : "right";
+
+    const isEnabled = part.motorConfig?.isEnable ?? true;
     const maxSpeed =
       part.motorConfig?.maxSpeed ?? Number(part.properties?.maxSpeed) ?? 15;
-    const maxTorque = part.motorConfig?.maxTorque ?? 50;
+    const maxTorque =
+      part.motorConfig?.maxTorque ?? Number(part.properties?.motorTorque) ?? 50;
+
+    // Kiểm tra xem người dùng có đang can thiệp bàn phím không
+    const hasManualInput =
+      input.linear !== 0 || input.angular !== 0 || input.manualBrake;
 
     let driveRatio = 0;
-    if (driveSide === "left") {
-      driveRatio = clamp(input.linear + input.angular, -1.0, 1.0);
-    } else if (driveSide === "right") {
-      driveRatio = clamp(input.linear - input.angular, -1.0, 1.0);
+    if (hasManualInput) {
+      if (driveSide === "left") {
+        driveRatio = clamp(input.linear + input.angular, -1.0, 1.0);
+      } else if (driveSide === "right") {
+        driveRatio = clamp(input.linear - input.angular, -1.0, 1.0);
+      } else {
+        driveRatio = clamp(input.linear, -1.0, 1.0);
+      }
+    } else {
+      // Chế độ mô phỏng tự hành mặc định khi không có phím nhấn:
+      // Xe tự động chạy tiến tới, gặp vật cản thì phanh
+      driveRatio = isEnabled ? 1.0 : 0;
     }
 
-    const requestedSpeed = driveRatio * maxSpeed;
+    const requestedSpeed = isEnabled ? driveRatio * maxSpeed : 0;
     const isBraking = blocked || input.manualBrake;
     const appliedSpeed = isBraking ? 0 : requestedSpeed;
 
@@ -76,7 +101,7 @@ export default function SimulatedWheel3D({ part, chassis, chassisRef }: Props) {
       id: part.id,
       targetSpeed: requestedSpeed,
       appliedSpeed: appliedSpeed,
-      enabled: driveSide !== "none",
+      enabled: isEnabled,
     });
   });
 

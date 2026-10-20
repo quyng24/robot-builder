@@ -30,7 +30,7 @@ export class SimulationState {
     linear: 0,
     angular: 0,
     manualBrake: false,
-  }
+  };
   private readonly bodies = new Map<string, BodyState>();
   private readonly sensors = new Map<string, SensorReading>();
   private readonly motors = new Map<string, MotorCommand>();
@@ -41,7 +41,7 @@ export class SimulationState {
     this.sensors.clear();
     this.motors.clear();
     this.autoBraking = false;
-    this.controllerInput = {linear: 0, angular: 0, manualBrake: false};
+    this.controllerInput = { linear: 0, angular: 0, manualBrake: false };
     this.tick = { step: 0, elapsed: 0, dt: 0 };
 
     for (const part of parts) {
@@ -101,6 +101,14 @@ export class SimulationState {
 
   upsertSensor(reading: SensorReading): void {
     this.sensors.set(reading.id, { ...reading });
+    let anyBlocked = false;
+    for (const sensor of this.sensors.values()) {
+      if (sensor.blocked) {
+        anyBlocked = true;
+        break;
+      }
+    }
+    this.autoBraking = anyBlocked;
   }
 
   upsertMotor(command: MotorCommand): void {
@@ -108,13 +116,13 @@ export class SimulationState {
   }
 
   setControllerInput(input: Partial<ControllerInput>): void {
-    this.controllerInput = {...this.controllerInput, ...input};
+    this.controllerInput = { ...this.controllerInput, ...input };
   }
 
   getControllerInput(): ControllerInput {
     return { ...this.controllerInput };
   }
-  
+
   setRobotBlocked(blocked: boolean): void {
     this.autoBraking = blocked;
   }
@@ -159,7 +167,7 @@ export class SimulationState {
     return {
       tick: this.tick ? { ...this.tick } : null,
       autoBraking: this.autoBraking,
-      controllerInput: {...this.controllerInput},
+      controllerInput: { ...this.controllerInput },
       bodies,
       sensors,
       motors,
@@ -176,7 +184,7 @@ export class SimulationState {
   clear(): void {
     this.tick = null;
     this.autoBraking = false;
-    this.controllerInput = { linear: 0, angular: 0, manualBrake: false};
+    this.controllerInput = { linear: 0, angular: 0, manualBrake: false };
     this.bodies.clear();
     this.sensors.clear();
     this.motors.clear();

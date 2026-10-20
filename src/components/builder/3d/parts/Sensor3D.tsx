@@ -24,8 +24,7 @@ export default function Sensor3D({
   chassisRef,
 }: SensorProps) {
   const mode = useRobotStore((state) => state.mode);
-  const setIsBlocked = useRobotStore((state) => state.setIsBlocked);
-  const selectPart = useRobotStore(state => state.selectPart);
+  const selectPart = useRobotStore((state) => state.selectPart);
 
   const sensorRef = useRef<THREE.Mesh>(null!);
   const sensorMatRef = useRef<THREE.MeshStandardMaterial>(null!);
@@ -37,6 +36,7 @@ export default function Sensor3D({
 
   const { rapier, world } = useRapier();
   const sensorRange = Number(part.properties.range) || 5;
+  const defaultBodyColor = part.properties.color || "#94a3b8";
 
   const { localPos, localEuler } = useMemo(() => {
     const chassisPos = new THREE.Vector3(...chassis.position);
@@ -60,10 +60,7 @@ export default function Sensor3D({
   }, [part, chassis]);
 
   useAfterPhysicsStep(() => {
-    if (mode === "build") {
-      setIsBlocked(false);
-      return;
-    }
+    if (mode === "build") return;
 
     const chassisBody = chassisRef.current;
     if (!chassisBody || !sensorMatRef.current || !laserMatRef.current) return;
@@ -112,8 +109,6 @@ export default function Sensor3D({
 
     if (hit) {
       const distance = hit.timeOfImpact;
-      setIsBlocked(true);
-      getSimulationState().setRobotBlocked(true);
       getSimulationState().upsertSensor({
         id: part.id,
         range: sensorRange,
@@ -123,15 +118,13 @@ export default function Sensor3D({
       sensorMatRef.current.color.set("#ef4444");
       laserMatRef.current.color.set("#ef4444");
     } else {
-      setIsBlocked(false);
-      getSimulationState().setRobotBlocked(false);
       getSimulationState().upsertSensor({
         id: part.id,
         range: sensorRange,
         distance: null,
         blocked: false,
       });
-      sensorMatRef.current.color.set("#10b981");
+      sensorMatRef.current.color.set(defaultBodyColor);
       laserMatRef.current.color.set("#10b981");
     }
   });
@@ -143,11 +136,11 @@ export default function Sensor3D({
       rotation={[localEuler.x, localEuler.y, localEuler.z]}
       onClick={(e) => {
         e.stopPropagation();
-        if (mode === 'build') selectPart(part.id)
+        if (mode === "build") selectPart(part.id);
       }}
     >
       <sphereGeometry args={[0.3, 16, 16]} />
-      <meshStandardMaterial ref={sensorMatRef} color="#94a3b8" />
+      <meshStandardMaterial ref={sensorMatRef} color={defaultBodyColor} />
 
       <mesh
         position={[0, 0, sensorRange / 2]}

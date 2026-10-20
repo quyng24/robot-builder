@@ -14,15 +14,17 @@ import { useRobotStore } from "@/store/useRobotStore";
 export default function RobotAssembly({ parts }: { parts: RobotPart[] }) {
   const chassisRef = useRef<RapierRigidBody>(null!);
   const mode = useRobotStore((state) => state.mode);
+  const selectPart = useRobotStore((state) => state.selectPart);
   const generation = useSimulationGeneration();
 
   const chassis = parts.find((p) => p.type === "chassis");
   const wheels = parts.filter((p) => p.type === "wheel");
   const walls = parts.filter((p) => p.type === "wall");
-  const sensor = parts.find((p) => p.type === "sensor");
+  const sensors = parts.filter((p) => p.type === "sensor");
   const staticParts = parts.filter(
     (p) => !["chassis", "wheel", "wall", "sensor"].includes(p.type),
   );
+
   return (
     <>
       {walls.map((wall) => (
@@ -39,15 +41,44 @@ export default function RobotAssembly({ parts }: { parts: RobotPart[] }) {
           part={chassis}
           ref={chassisRef}
         >
-          {sensor && (
+          {sensors.map((sensor) => (
             <Sensor3D
+              key={`${sensor.id}-${mode}-${generation}`}
               part={sensor}
               chassis={chassis}
               chassisRef={chassisRef}
             />
-          )}
+          ))}
         </Chassis3D>
       )}
+
+      {/* Render unattached sensors if there is no chassis (build mode) */}
+      {!chassis &&
+        sensors.map((sensor) => (
+          <mesh
+            key={`${sensor.id}-${mode}-${generation}`}
+            position={sensor.position}
+            rotation={sensor.rotation}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (mode === "build") selectPart(sensor.id);
+            }}
+          >
+            <sphereGeometry args={[0.3, 16, 16]} />
+            <meshStandardMaterial
+              color={sensor.properties.color || "#94a3b8"}
+            />
+            <mesh
+              position={[0, 0, (Number(sensor.properties.range) || 5) / 2]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
+              <cylinderGeometry
+                args={[0.02, 0.02, Number(sensor.properties.range) || 5]}
+              />
+              <meshBasicMaterial color="#10b981" transparent opacity={0.5} />
+            </mesh>
+          </mesh>
+        ))}
 
       {wheels.map((wheel) => {
         if (mode === "build" || !chassis)

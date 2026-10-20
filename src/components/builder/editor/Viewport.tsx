@@ -19,6 +19,7 @@ export default function Viewport() {
     useRobotStore();
   useKeyboardController(mode === "simulate");
   const selectedPartData = parts.find((p) => p.id === selectedPartId);
+
   return (
     <main className="flex-1 bg-slate-950 relative flex items-center justify-center group">
       {/* 3D Space */}
@@ -62,7 +63,12 @@ export default function Viewport() {
         </div>
       )}
 
-      <div className="absolute bottom-4 right-4 z-10 text-slate-500 text-xs flex gap-2">
+      <div className="absolute bottom-4 right-4 z-10 text-slate-500 text-xs flex gap-2 items-center">
+        {mode === "simulate" && (
+          <kbd className="bg-indigo-950/80 border border-indigo-700/60 text-indigo-300 px-2 py-1 rounded font-mono">
+            W/S: Tiến/Lùi · A/D: Rẽ · Space: Phanh
+          </kbd>
+        )}
         <kbd className="bg-slate-800 px-2 py-1 rounded">
           Chuột trái: Xoay Camera
         </kbd>

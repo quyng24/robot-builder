@@ -1,4 +1,4 @@
-import PropertiesPanel from './PropetiesPanel';
+import PropertiesPanel from './PropertiesPanel';
 import RobotTree from './RobotTree';
 
 export default function SidebarRight() {
